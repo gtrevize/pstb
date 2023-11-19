@@ -7,13 +7,14 @@ The `pstb_logger` module provides functions and classes for setting up and confi
 import logging
 import os
 import sqlite3
+import sys
 
 import pytest
 
-from src.pstb.log import pstb_logger
+# Add the src directory to the PYTHONPATH
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src")))
 
-# sys.path.append("../../../")
-# import pstb_logger
+from pstb.log import pstb_logger
 
 
 @pytest.fixture

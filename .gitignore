@@ -13,6 +13,8 @@ settings.py
 env/
 venv/
 .venv/
+venv_dev/
+.venv_dev/
 build/
 develop-eggs/
 dist/
@@ -88,4 +90,7 @@ target/
 
 # databases
 **/*.db
+
+# log directories
+**/logs
 

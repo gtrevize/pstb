@@ -1,3 +1,16 @@
+"""
+This module provides functions to generate random numbers and strings.
+It uses random.org as a source of true random numbers.
+If that fails, it falls back to pseudo-random numbers using urandom.
+
+Functions:
+    get_true_random_bytes(count, timeout=10, fail_on_error=False)
+    get_true_random_integers(count, min, max, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False, unique=False)
+    generate_random_integers(count, min_value, max_value)
+    generate_random_string(length)
+    check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False)
+"""
+
 import os
 import secrets
 import string
@@ -13,6 +26,8 @@ from typing_extensions import Literal, TypedDict
 
 
 class IntegerPayloadParams(TypedDict):
+    """Type hint for the params field of the JSON-RPC request payload to generate integers"""
+
     apiKey: str
     n: int
     min: int
@@ -21,6 +36,8 @@ class IntegerPayloadParams(TypedDict):
 
 
 class RandomOrgIntegersPayload(TypedDict):
+    """Type hint for the JSON-RPC request payload to generate integers"""
+
     jsonrpc: Literal["4.0"]
     method: Literal["generateIntegers"]
     params: IntegerPayloadParams
@@ -72,9 +89,7 @@ _RANDOM_ORG_INTEGERS_PAYLOAD: RandomOrgIntegersPayload = {
 ######################
 
 
-def get_true_random_bytes(
-    count: int, timeout: int = 10, fail_on_error: bool = False
-) -> bytes:
+def get_true_random_bytes(count: int, timeout: int = 10, fail_on_error: bool = False) -> bytes:
     """
     Fetches true random bytes from random.org.
     If that fails falls back to pseudo-random numbers using urandom.
@@ -110,26 +125,20 @@ def get_true_random_bytes(
         else:
             # If quota is not sufficient raise Exception or fallback to pseudo-random numbers
             if fail_on_error:
-                raise requests.exceptions.RequestException(
-                    f"Quota exceeded trying to generate {count * 8} bits."
-                )
+                raise requests.exceptions.RequestException(f"Quota exceeded trying to generate {count * 8} bits.")
 
     except requests.exceptions.Timeout:
         if fail_on_error:
-            raise requests.exceptions.RequestException(
-                f"Request to random.org timed out after {timeout} seconds"
-            )
+            raise requests.exceptions.RequestException(f"Request to random.org timed out after {timeout} seconds")
     except requests.exceptions.RequestException as e:
         # Handle timeout or other request errors raise Exception or fallback to pseudo-random numbers
         if fail_on_error:
-            raise requests.exceptions.RequestException(
-                f"Request to random.org failed with exception {e}"
-            )
+            raise requests.exceptions.RequestException(f"Request to random.org failed with exception {e}")
 
     return os.urandom(count)
 
 
-def get_random_integers(
+def get_true_random_integers(
     count: int,
     min: int,
     max: int,
@@ -171,9 +180,7 @@ def get_random_integers(
     # Check arguments sanity
     if min > max:
         if fail_on_error:
-            raise ValueError(
-                "Minimum value must be less than or equal to the maximum value"
-            )
+            raise ValueError("Minimum value must be less than or equal to the maximum value")
         else:
             return None
 
@@ -187,9 +194,7 @@ def get_random_integers(
 
     try:
         # Check quota before requesting true random numbers
-        if check_random_org_quota(
-            count, timeout=timeout, api_key=api_key, fail_on_error=fail_on_error
-        ):
+        if check_random_org_quota(count, timeout=timeout, api_key=api_key, fail_on_error=fail_on_error):
             if api_key:
                 # Populate the JSON-RPC integers request payload
                 random_org_integers_payload = _RANDOM_ORG_INTEGERS_PAYLOAD.copy()
@@ -214,9 +219,7 @@ def get_random_integers(
                     else:
                         # If quota is not sufficient raise Exception or fallback to pseudo-random numbers
                         if fail_on_error:
-                            raise requests.exceptions.RequestException(
-                                "Warning not enough quota in random.org"
-                            )
+                            raise requests.exceptions.RequestException("Warning not enough quota in random.org")
                 else:
                     # If error on request raise Exception or fallback to pseudo-random numbers
                     if fail_on_error:
@@ -228,10 +231,7 @@ def get_random_integers(
                 random_org_url = _RANDOM_ORG_URL.format(count=count)
                 response = requests.get(random_org_url, timeout=timeout)
                 if response.status_code == 200:
-                    return [
-                        int(byte) % (max - min + 1) + min
-                        for byte in bytes.fromhex(response.text)
-                    ]
+                    return [int(byte) % (max - min + 1) + min for byte in bytes.fromhex(response.text)]
                 else:
                     # If error on request raise Exception or fallback to pseudo-random numbers
                     if fail_on_error:
@@ -241,22 +241,16 @@ def get_random_integers(
         else:
             # If quota is not sufficient raise Exception or fallback to pseudo-random numbers
             if fail_on_error:
-                raise requests.exceptions.RequestException(
-                    f"Quota exceeded trying to generate {count} integers."
-                )
+                raise requests.exceptions.RequestException(f"Quota exceeded trying to generate {count} integers.")
 
     except requests.exceptions.Timeout:
         if fail_on_error:
-            raise requests.exceptions.RequestException(
-                f"Request to random.org timed out after {timeout} seconds"
-            )
+            raise requests.exceptions.RequestException(f"Request to random.org timed out after {timeout} seconds")
 
     except requests.exceptions.RequestException as e:
         # Handle timeout or other request errors raise Exception or fallback to pseudo-random numbers
         if fail_on_error:
-            raise requests.exceptions.RequestException(
-                f"Request to random.org failed with exception {e}"
-            )
+            raise requests.exceptions.RequestException(f"Request to random.org failed with exception {e}")
 
     # Fallback to pseudo-random numbers using secrets module
     if not unique:
@@ -265,12 +259,8 @@ def get_random_integers(
         start_time = time.perf_counter()
         generated_numbers: set[int] = set()
         while len(generated_numbers) < count:
-            elapsed_time = (
-                time.perf_counter() - start_time
-            ) * 1000  # Convert to milliseconds
-            if timeout is not None and elapsed_time > (
-                timeout * 1000
-            ):  # Convert timeout to milliseconds
+            elapsed_time = (time.perf_counter() - start_time) * 1000  # Convert to milliseconds
+            if timeout is not None and elapsed_time > (timeout * 1000):  # Convert timeout to milliseconds
                 raise ValueError(
                     f"Timeout: {timeout} secs; generating {count} unique random integers within the range {min}-{max}"
                 )
@@ -307,9 +297,7 @@ def generate_random_string(length):
     return "".join(os.urandom.choice(characters) for _ in range(length))
 
 
-def check_random_org_quota(
-    count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False
-):
+def check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False):
     """
     Checks if there is enough quota left on random.org.
 
@@ -331,9 +319,7 @@ def check_random_org_quota(
     try:
         if api_key:
             # Check quota with an API key
-            response = requests.post(
-                _RANDOM_ORG_API_URL, json=_RANDOM_ORG_QUOTA_PAYLOAD, timeout=timeout
-            )
+            response = requests.post(_RANDOM_ORG_API_URL, json=_RANDOM_ORG_QUOTA_PAYLOAD, timeout=timeout)
             if response.status_code == 200:
                 remaining = response.json()["result"]["bitsLeft"]
                 if remaining >= count * 8:
@@ -366,18 +352,14 @@ def check_random_org_quota(
 
     except requests.exceptions.Timeout:
         if fail_on_error:
-            raise requests.exceptions.RequestException(
-                f"Request to random.org timed out after {timeout} seconds"
-            )
+            raise requests.exceptions.RequestException(f"Request to random.org timed out after {timeout} seconds")
         else:
             return False
 
     except requests.exceptions.RequestException as e:
         # Handle timeout or other request errors raise Exception or fallback to pseudo-random numbers
         if fail_on_error:
-            raise requests.exceptions.RequestException(
-                f"Request to random.org failed with exception {e}"
-            )
+            raise requests.exceptions.RequestException(f"Request to random.org failed with exception {e}")
         else:
             return False
 
