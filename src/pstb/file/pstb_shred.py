@@ -33,10 +33,8 @@ Functions:
 """
 import os
 import random
-import string
 
-import requests
-from tbx.file.speed import find_best_block_size
+from pstb.file.pstb_speed import find_best_block_size
 
 
 def overwrite_with_pattern(file, pattern, block_size):
@@ -80,16 +78,15 @@ def verify_pass(file_path, expected_pattern, block_size):
     return True
 
 
-def dod522022m_shred(
-    file_path, block_size=None, true_random=False, standard="3-pass", adaptive=True
-):
+def dod522022m_shred(file_path, block_size=None, true_random=False, standard="3-pass", adaptive=True):
     """
     Securely shreds a file according to DoD 5220.22-M standard.
 
     Args:
         file_path (str): The path to the file to be shredded.
         block_size (int, optional): The block size for reading and writing. If None, it will be determined adaptively.
-        true_random (bool, optional): Whether to use true random numbers for overwriting. Default is False (pseudo-random).
+        true_random (bool, optional): Whether to use true random numbers for overwriting.
+            Default is False (pseudo-random).
         standard (str, optional): The DoD standard to follow, either "3-pass" or "7-pass". Default is "3-pass".
         adaptive (bool, optional): Whether to adaptively determine the block size based on speed. Default is True.
 
@@ -98,9 +95,7 @@ def dod522022m_shred(
     """
     # Validate the 'standard' parameter
     if standard not in ["3-pass", "7-pass"]:
-        raise ValueError(
-            "Invalid value for 'standard' parameter. It must be '3-pass' or '7-pass'."
-        )
+        raise ValueError("Invalid value for 'standard' parameter. It must be '3-pass' or '7-pass'.")
 
     # If 'block_size' is not specified and 'adaptive' is True, find the best block size
     if block_size is None and adaptive:
@@ -124,9 +119,7 @@ def dod522022m_shred(
                 elif pass_num == 1:
                     pattern = b"\xFF"  # Pass 2: Overwrite with all ones (0xFF)
                 else:
-                    pattern = bytes(
-                        [random.randint(0, 255) for _ in range(block_size)]
-                    )  # Pass 3-7: Random data
+                    pattern = bytes([random.randint(0, 255) for _ in range(block_size)])  # Pass 3-7: Random data
             overwrite_with_pattern(file, pattern, block_size)
 
         # Verify pass

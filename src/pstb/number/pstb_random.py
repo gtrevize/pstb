@@ -35,12 +35,27 @@ class IntegerPayloadParams(TypedDict):
     replacement: bool
 
 
+class QuotaPayloadParams(TypedDict):
+    """Type hint for the params field of the JSON-RPC request to check the quota"""
+
+    apiKey: str
+
+
 class RandomOrgIntegersPayload(TypedDict):
     """Type hint for the JSON-RPC request payload to generate integers"""
 
     jsonrpc: Literal["4.0"]
     method: Literal["generateIntegers"]
     params: IntegerPayloadParams
+    id: int
+
+
+class RandomOrgQuotaPayload(TypedDict):
+    """Type hint for the JSON-RPC request payload to retrieve the quota"""
+
+    jsonrpc: Literal["4.0"]
+    method: Literal["getUsage"]
+    params: QuotaPayloadParams
     id: int
 
 
@@ -55,13 +70,13 @@ load_dotenv()
 # Constants
 ###########
 
-_RANDOM_ORG_API_KEY = str(os.environ.get("_RANDOM_ORG_API_KEY"))
-_RANDOM_ORG_QUOTA_URL = "https://www.random.org/quota/?format=plain"
-_RANDOM_ORG_URL = "https://www.random.org/cgi-bin/randbyte?nbytes={count}&format=h"
-_RANDOM_ORG_API_URL = "https://api.random.org/json-rpc/4/invoke"
+_RANDOM_ORG_API_KEY: str = str(os.environ.get("_RANDOM_ORG_API_KEY"))
+_RANDOM_ORG_QUOTA_URL: str = "https://www.random.org/quota/?format=plain"
+_RANDOM_ORG_URL: str = "https://www.random.org/cgi-bin/randbyte?nbytes={count}&format=h"
+_RANDOM_ORG_API_URL: str = "https://api.random.org/json-rpc/4/invoke"
 
 # Define the JSON-RPC request payload to get usage
-_RANDOM_ORG_QUOTA_PAYLOAD = {
+_RANDOM_ORG_QUOTA_PAYLOAD: RandomOrgQuotaPayload = {
     "jsonrpc": "4.0",
     "method": "getUsage",
     "params": {"apiKey": _RANDOM_ORG_API_KEY},
@@ -271,6 +286,18 @@ def get_true_random_integers(
 
 
 def generate_random_integers(count, min_value, max_value):
+    """
+    Generates a list of random integers.
+
+    Args:
+        count (int): The number of integers to generate.
+        min_value (int): The smallest value allowed for each integer.
+        max_value (int): The largest value allowed for each integer.
+
+    Returns:
+        list: The generated random integers.
+    """
+
     byte_data = get_true_random_bytes(count)
     return [int(byte) % (max_value - min_value + 1) + min_value for byte in byte_data]
 
@@ -362,11 +389,3 @@ def check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_
             raise requests.exceptions.RequestException(f"Request to random.org failed with exception {e}")
         else:
             return False
-
-
-def main():
-    pass
-
-
-if __name__ == "__main__":
-    main()

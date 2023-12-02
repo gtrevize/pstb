@@ -1,0 +1,9 @@
+from _typeshed import Incomplete
+
+def dict_to_csv_str(data: list[dict], field_names: list | None = ..., column_headers: bool = ..., quoting: int = ..., quote_char: str = ..., delimiter: str = ...) -> str: ...
+def dict_to_html_str(data: dict | list, indent: int = ...) -> str: ...
+
+data: Incomplete
+data_html: Incomplete
+
+def main() -> None: ...
