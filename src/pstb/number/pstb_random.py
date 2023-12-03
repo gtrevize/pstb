@@ -3,18 +3,28 @@ This module provides functions to generate random numbers and strings.
 It uses random.org as a source of true random numbers.
 If that fails, it falls back to pseudo-random numbers using urandom.
 
+Note:
+    True random numbers generators (TRNG) is a complex topic, and the subject of significant debate.
+    It can have significant implications in security, privacy, etc.
+    You should understand the differences and caveats between TRNG, PRNG, and CSPRNG before using them.
+    Here is an archived URL of a good discussion on the topic: https://perma.cc/CZK7-EVR4
+
 Functions:
     get_true_random_bytes(count, timeout=10, fail_on_error=False)
-    get_true_random_integers(count, min, max, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False, unique=False)
+    get_true_random_integers(count, min, max, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False, 
+        unique=False)
     generate_random_integers(count, min_value, max_value)
     generate_random_string(length)
     check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False)
 """
 
+import argparse
 import os
 import secrets
 import string
 import time
+from itertools import count
+from typing import Any, Generator
 
 import requests
 from dotenv import load_dotenv
@@ -70,7 +80,7 @@ load_dotenv()
 # Constants
 ###########
 
-_RANDOM_ORG_API_KEY: str = str(os.environ.get("_RANDOM_ORG_API_KEY"))
+_RANDOM_ORG_API_KEY: str = os.environ.get("_RANDOM_ORG_API_KEY", "")
 _RANDOM_ORG_QUOTA_URL: str = "https://www.random.org/quota/?format=plain"
 _RANDOM_ORG_URL: str = "https://www.random.org/cgi-bin/randbyte?nbytes={count}&format=h"
 _RANDOM_ORG_API_URL: str = "https://api.random.org/json-rpc/4/invoke"
@@ -98,6 +108,11 @@ _RANDOM_ORG_INTEGERS_PAYLOAD: RandomOrgIntegersPayload = {
     "id": 42,
 }
 
+# Define the default valid characters for the random string generator
+_ALPHANUMERIC_CHARACTERS: str = string.ascii_letters + string.digits
+
+# Define the maximum length of the random string generator
+_MAX_STRING_LENGTH: int = 1000
 
 ######################
 # Function definitions
@@ -184,8 +199,9 @@ def get_true_random_integers(
 
     Returns:
         list: The fetched random integers.
+
         None: If unique is True and and fail_on_error is False and it is not possible to
-            generate unique random integers given the range.
+        generate unique random integers given the range.
 
     Raises:
         requests.exceptions.RequestException: If the request to random.org fails and fail_on_error is True.
@@ -199,7 +215,7 @@ def get_true_random_integers(
         else:
             return None
 
-    if (max - min + 1) < count:
+    if unique and ((max - min + 1) < count):
         if fail_on_error:
             raise ValueError(
                 f"It is not possible to generate unique {count} random integers given the range {min}-{max}"
@@ -285,43 +301,177 @@ def get_true_random_integers(
                 return [min + secrets.randbelow(max - min + 1) for _ in range(count)]
 
 
-def generate_random_integers(count, min_value, max_value):
+def true_random_choice(
+    choices_set: list | dict,
+    count: int = 1,
+    unique: bool = False,
+    timeout: int = 10,
+    api_key: str = _RANDOM_ORG_API_KEY,
+) -> Any | Generator[Any, None, None] | None:
     """
-    Generates a list of random integers.
+    Makes a choice from a given set of choices.
+    It uses true random numbers from random.org or falls back to pseudo-random numbers using urandom.
+    If count is greater than 1, it yields the choices.
 
     Args:
-        count (int): The number of integers to generate.
-        min_value (int): The smallest value allowed for each integer.
-        max_value (int): The largest value allowed for each integer.
+        choices_set (list | dict): The set of choices to choose from. It can be a list or a dictionary.
+        count (int, optional): The number of integers to fetch. Default is 1.
+        unique (bool, optional): If True, the fetched integers will be unique within this call. Default is False.
+        timeout (int, optional): The timeout for the function to complete. Default is 10 seconds.
+            It has to main uses:
+
+            As a timeout for the request to random.org (in seconds).
+
+            As a timeout for the function to complete (in seconds). This is used to ensure that the function
+            does not run for too long, especially when generating unique random integers.
+
+        api_key (str, optional): The API key to use for the request. If None, the value of the **_RANDOM_ORG_API_KEY**
+            environment variable will be used. Default is None.
+
+    Note:
+        If a dictionary is passed as choices_set, the choice will be made from the values of the dictionary.
+        It is not possible to make a choice from the keys of the dictionary.
+        Also it is assumed that the values of the dictionary are primitive types (int, str, etc.). If the values
+        are complex types a TypeError exception will be raised.
+
+    Yields:
+        Any: A random element of the given choices set. If unique is True the yielded elements will be unique.
 
     Returns:
-        list: The generated random integers.
+        Any: A random element of the given choices set.
+
+        None: If count is greater than 1 and fail_on_error is False and it is not possible to generate unique
+        random integers given the range.
+
+    Raises:
+        TypeError: If choices_set is not a list or a dictionary.
+        TypeError: If the values of the dictionary are not primitive types (int, float, str, bool, NoneType).
+        ValueError: If count is less than 1.
+
+    See Also:
+        :func:`get_true_random_integers` function for more information on how the random integers are generated
+
+        :ref: random.org API https://api.random.org/json-rpc/4/basic
+
+        :ref: Python random numbers https://docs.python.org/3/library/secrets.html#random-numbers
+
+    Examples:
+
+        >>> true_random_choice([1, 2, 3, 4, 5])
+        4
+
+        >>> true_random_choice([1, 2, 3, 4, 5], count=3)
+        2
+        5
+        1
+
     """
+    # Check arguments sanity
+    if isinstance(choices_set, dict):
+        choices_set = list(choices_set.values())
+        # check if the values of the dictionary are primitive types
+        if not all(isinstance(choice, (int, float, str, bool, type(None))) for choice in choices_set):
+            raise TypeError("The values of the dictionary must be primitive types (int, float, str, bool, NoneType)")
+    elif isinstance(choices_set, list):
+        pass
+    else:
+        raise TypeError("choices_set must be a list or a dictionary")
 
-    byte_data = get_true_random_bytes(count)
-    return [int(byte) % (max_value - min_value + 1) + min_value for byte in byte_data]
+    if count < 1:
+        raise ValueError("count must be greater than 0")
+
+    # Get the random integers
+    random_integers = get_true_random_integers(
+        count, 1, len(choices_set), timeout=timeout, api_key=api_key, unique=unique
+    )
+    if not random_integers:
+        return None
+
+    # Return or yield the choices
+    if count == 1:
+        return choices_set[random_integers[0]]
+    else:
+        choices = [choices_set[i - 1] for i in random_integers]
+        yield from choices
+
+    return None  # This is needed to avoid a warning from mypy
 
 
-def generate_random_string(length):
+def get_true_random_string(
+    length, valid_characters: list[str] | str = _ALPHANUMERIC_CHARACTERS, unique: bool = False, timeout: int = 10
+) -> str | None:
     """
     Generates a random string of alphanumeric characters.
 
     Args:
-        length (int): The length of the random string to generate.
+        length (int): The length of the random string to generate. Must be between 1 and _MAX_STRING_LENGTH.
+        valid_characters (list[str] | str, optional): The list of valid characters to use for the random string.
+            default is _ALPHANUMERIC_CHARACTERS which is equal to `string.ascii_letters + string.digits`.
+        unique (bool, optional): If True, the generated string will be unique within this call. Default is False.
+        timeout (int, optional): The timeout for the function to complete. Default is 10 seconds.
 
     Returns:
         str: The generated random string.
 
+        None: If it is not possible to generate unique random integers given the range and the timeout.
+
     Raises:
-        ValueError: If length is less than 1.
+        ValueError: If length is less than 1 or greater than _MAX_STRING_LENGTH.
+        ValueError: If length is greater than the number of valid characters and unique is True.
+        TypeError: If valid_characters is not a list or a string.
+
+    See Also:
+        :func:`true_random_choice` function for more information on how the random integers are generated
+
+    Examples:
+
+            >>> generate_random_string(10)
+            's2F4f2D4f2'
+
+            >>> generate_random_string(10, unique=True)
+            's2F4f2D4f2'
+
+            >>> generate_random_string(10, valid_characters="abc")
+            'cbbabccacc'
+
+            >>> generate_random_string(10, valid_characters="abc", unique=True)
+            'cbbabccacc'
+
+            >>> generate_random_string(10, valid_characters=["a", "b", "c"])
+            'cbbabccacc'
+
+            >>> generate_random_string(10, valid_characters=["a", "b", "c"], unique=True)
+            'cbbabccacc'
     """
 
-    if length < 1:
-        raise ValueError("length must be greater than 0")
+    # Check arguments sanity
+    if not (1 <= length < _MAX_STRING_LENGTH):
+        raise ValueError(f"length must be between 1 and {_MAX_STRING_LENGTH}")
 
-    characters = string.ascii_letters + string.digits
-    numbers = get_true_random_bytes(length)
-    return "".join(os.urandom.choice(characters) for _ in range(length))
+    if unique and (length > len(valid_characters)):
+        raise ValueError(
+            f"length {length} must be less than or equal to the number of valid characters {len(valid_characters)}"
+        )
+
+    if isinstance(valid_characters, str):
+        valid_characters = list(valid_characters)
+    elif isinstance(valid_characters, list):
+        pass
+    else:
+        raise TypeError("valid_characters must be a list or a string")
+
+    # Return the result
+    if count == 1:
+        return str(true_random_choice(valid_characters))
+    else:
+        character_generator = true_random_choice(valid_characters, count=length, unique=unique, timeout=timeout)
+        if not character_generator:
+            return None
+
+        result = ""
+        for character in character_generator:
+            result += character
+        return result
 
 
 def check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False):
@@ -389,3 +539,71 @@ def check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_
             raise requests.exceptions.RequestException(f"Request to random.org failed with exception {e}")
         else:
             return False
+
+
+def main():
+    """
+    Random Generator
+
+    This script generates random strings or random integers based on the provided arguments.
+
+    Arguments:
+    -s, --string: Generate a random string
+    -l, --length: Length of the random string (default: 10)
+    -c, --count: Number of random strings to generate (default: 1)
+    -v, --valid-characters: Valid characters for the random string
+    -i, --integers: Generate random integers
+    -u, --unique: Generate unique random integers or strings
+    -t, --timeout: Timeout for the API request (default: 10)
+    -m, --min: Minimum value for random integers (default: 0)
+    -x, --max: Maximum value for random integers (default: 100)
+    -f, --fail-on-error: Fail on error when making API requests
+    """
+
+    parser = argparse.ArgumentParser(description="Random Generator")
+    parser.add_argument("-s", "--string", action="store_true", help="Generate a random string")
+    parser.add_argument("-l", "--length", type=int, default=10, help="Length of the random string. Default is 10")
+    parser.add_argument(
+        "-c", "--count", type=int, default=1, help="Number of random strings to generate. Default is 1"
+    )
+    parser.add_argument(
+        "-v", "--valid-characters", type=str, help="Valid characters for the random string. Default is alphanumeric"
+    )
+    parser.add_argument("-i", "--integers", action="store_true", help="Generate random integers")
+    parser.add_argument("-u", "--unique", action="store_true", help="Generate unique random integers or strings")
+    parser.add_argument(
+        "-t", "--timeout", type=int, default=10, help="Timeout for the API request. Default is 10 seconds"
+    )
+    parser.add_argument("-m", "--min", type=int, default=0, help="Minimum value for random integers. Default is 0")
+    parser.add_argument("-x", "--max", type=int, default=100, help="Maximum value for random integers. Default is 100")
+    parser.add_argument("-f", "--fail-on-error", action="store_true", help="Fail on error when making API requests")
+
+    args = parser.parse_args()
+
+    if args.string:
+        length = args.length if args.length else 10
+        count = args.count if args.count else 1
+        valid_characters = args.valid_characters if args.valid_characters else None
+
+        for _ in range(count):
+            if valid_characters:
+                random_string = get_true_random_string(length, valid_characters, args.unique, args.timeout)
+            else:
+                random_string = get_true_random_string(length, unique=args.unique, timeout=args.timeout)
+            print(random_string)
+    elif args.integers:
+        count = args.count if args.count else 1
+        min_value = args.min if args.min else 0
+        max_value = args.max if args.max else 100
+        unique = args.unique if args.unique else False
+
+        random_integers = get_true_random_integers(
+            count, min_value, max_value, args.timeout, unique=unique, fail_on_error=args.fail_on_error
+        )
+        print(random_integers)
+    else:
+        parser.print_usage()
+
+
+if __name__ == "__main__":
+    main()

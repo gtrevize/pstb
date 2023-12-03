@@ -74,10 +74,10 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#src.pstb.number.pstb_random.check_random_org_quota"><code class="docutils literal notranslate"><span class="pre">check_random_org_quota()</span></code></a></li>
-<li><a class="reference internal" href="#src.pstb.number.pstb_random.generate_random_integers"><code class="docutils literal notranslate"><span class="pre">generate_random_integers()</span></code></a></li>
 <li><a class="reference internal" href="#src.pstb.number.pstb_random.generate_random_string"><code class="docutils literal notranslate"><span class="pre">generate_random_string()</span></code></a></li>
 <li><a class="reference internal" href="#src.pstb.number.pstb_random.get_true_random_bytes"><code class="docutils literal notranslate"><span class="pre">get_true_random_bytes()</span></code></a></li>
 <li><a class="reference internal" href="#src.pstb.number.pstb_random.get_true_random_integers"><code class="docutils literal notranslate"><span class="pre">get_true_random_integers()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.true_random_choice"><code class="docutils literal notranslate"><span class="pre">true_random_choice()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-src.pstb.number">Module contents</a></li>
@@ -119,6 +119,13 @@
 <p>This module provides functions to generate random numbers and strings.
 It uses random.org as a source of true random numbers.
 If that fails, it falls back to pseudo-random numbers using urandom.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>True random numbers generators (TRNG) is a complex topic, and the subject of significant debate.
+It can have significant implications in security, privacy, etc.
+You should understand the differences and caveats between TRNG, PRNG, and CSPRNG before using them.
+Here is an archived URL of a good discussion on the topic: <a class="reference external" href="https://perma.cc/CZK7-EVR4">https://perma.cc/CZK7-EVR4</a></p>
+</div>
 <dl class="simple">
 <dt>Functions:</dt><dd><p>get_true_random_bytes(count, timeout=10, fail_on_error=False)
 get_true_random_integers(count, min, max, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False, unique=False)
@@ -255,44 +262,63 @@ Default is False.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="src.pstb.number.pstb_random.generate_random_integers">
-<span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">generate_random_integers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#generate_random_integers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.generate_random_integers" title="Link to this definition"></a></dt>
-<dd><p>Generates a list of random integers.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>count</strong> (<em>int</em>) – The number of integers to generate.</p></li>
-<li><p><strong>min_value</strong> (<em>int</em>) – The smallest value allowed for each integer.</p></li>
-<li><p><strong>max_value</strong> (<em>int</em>) – The largest value allowed for each integer.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The generated random integers.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="src.pstb.number.pstb_random.generate_random_string">
-<span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">generate_random_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#generate_random_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.generate_random_string" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">generate_random_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_characters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#generate_random_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.generate_random_string" title="Link to this definition"></a></dt>
 <dd><p>Generates a random string of alphanumeric characters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>length</strong> (<em>int</em>) – The length of the random string to generate.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length</strong> (<em>int</em>) – The length of the random string to generate. Must be between 1 and _MAX_STRING_LENGTH.</p></li>
+<li><p><strong>valid_characters</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>str</em><em>, </em><em>optional</em>) – The list of valid characters to use for the random string.
+default is _VALID_CHARACTERS which is equal to <cite>string.ascii_letters + string.digits</cite>.</p></li>
+<li><p><strong>unique</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the generated string will be unique within this call. Default is False.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – The timeout for the function to complete. Default is 10 seconds.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The generated random string.</p>
+<dd class="field-even"><p><p>The generated random string.</p>
+<p>None: If it is not possible to generate unique random integers given the range and the timeout.</p>
+</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If length is less than 1.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If length is less than 1.</p></li>
+<li><p><strong>TypeError</strong> – If valid_characters is not a list or a string.</p></li>
+</ul>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#src.pstb.number.pstb_random.true_random_choice" title="src.pstb.number.pstb_random.true_random_choice"><code class="xref py py-func docutils literal notranslate"><span class="pre">true_random_choice()</span></code></a> function for more information on how the random integers are generated</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">generate_random_string</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">&#39;s2F4f2D4f2&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">generate_random_string</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">&#39;s2F4f2D4f2&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">generate_random_string</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">valid_characters</span><span class="o">=</span><span class="s2">&quot;abc&quot;</span><span class="p">)</span>
+<span class="go">&#39;cbbabccacc&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">generate_random_string</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">valid_characters</span><span class="o">=</span><span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">&#39;cbbabccacc&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">generate_random_string</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">valid_characters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">])</span>
+<span class="go">&#39;cbbabccacc&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">generate_random_string</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">valid_characters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">],</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">&#39;cbbabccacc&#39;</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -350,11 +376,9 @@ Default is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><p>The fetched random integers.
-None: If unique is True and and fail_on_error is False and it is not possible to</p>
-<blockquote>
-<div><p>generate unique random integers given the range.</p>
-</div></blockquote>
+<dd class="field-even"><p><p>The fetched random integers.</p>
+<p>None: If unique is True and and fail_on_error is False and it is not possible to
+generate unique random integers given the range.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -367,6 +391,72 @@ None: If unique is True and and fail_on_error is False and it is not possible to
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.true_random_choice">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">true_random_choice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">choices_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'None'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#true_random_choice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.true_random_choice" title="Link to this definition"></a></dt>
+<dd><p>Makes a choice from a given set of choices.
+It uses true random numbers from random.org or falls back to pseudo-random numbers using urandom.
+If count is greater than 1, it yields the choices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>choices_set</strong> (<em>list</em><em> | </em><em>dict</em>) – The set of choices to choose from. It can be a list or a dictionary.</p></li>
+<li><p><strong>count</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of integers to fetch. Default is 1.</p></li>
+<li><p><strong>unique</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the fetched integers will be unique within this call. Default is False.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – <p>The timeout for the function to complete. Default is 10 seconds.
+It has to main uses:</p>
+<p>As a timeout for the request to random.org (in seconds).</p>
+<p>As a timeout for the function to complete (in seconds). This is used to ensure that the function
+does not run for too long, especially when generating unique random integers.</p>
+</p></li>
+<li><p><strong>api_key</strong> (<em>str</em><em>, </em><em>optional</em>) – The API key to use for the request. If None, the value of the <strong>_RANDOM_ORG_API_KEY</strong>
+environment variable will be used. Default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Any</em> – A random element of the given choices set. If unique is True the yielded elements will be unique.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>A random element of the given choices set.</p>
+<p>None: If count is greater than 1 and fail_on_error is False and it is not possible to generate unique
+random integers given the range.</p>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Any</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>requests.exceptions.RequestException</strong> – If the request to random.org fails and fail_on_error is True.</p></li>
+<li><p><strong>requests.exceptions.Timeout</strong> – If the request to random.org times out and fail_on_error is True.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#src.pstb.number.pstb_random.get_true_random_integers" title="src.pstb.number.pstb_random.get_true_random_integers"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_true_random_integers()</span></code></a> function for more information on how the random integers are generated</p>
+<dl class="field-list simple">
+<dt class="field-odd">ref<span class="colon">:</span></dt>
+<dd class="field-odd"><p>random.org API <a class="reference external" href="https://api.random.org/json-rpc/4/basic">https://api.random.org/json-rpc/4/basic</a></p>
+</dd>
+<dt class="field-even">ref<span class="colon">:</span></dt>
+<dd class="field-even"><p>Python random numbers <a class="reference external" href="https://docs.python.org/3/library/secrets.html#random-numbers">https://docs.python.org/3/library/secrets.html#random-numbers</a></p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">true_random_choice</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">true_random_choice</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="go">5</span>
+<span class="go">1</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>

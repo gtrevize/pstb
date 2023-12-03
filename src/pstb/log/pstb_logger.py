@@ -291,6 +291,9 @@ def setup_logger():
     Default log output is console.
     Default log file is the name of the current file with a .log extension.
 
+    Todo:
+        * Add support for filename and path checking and creation if needed.
+
     Returns:
         The global logger instance.
     """
