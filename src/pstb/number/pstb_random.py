@@ -11,11 +11,17 @@ Note:
 
 Functions:
     get_true_random_bytes(count, timeout=10, fail_on_error=False)
-    get_true_random_integers(count, min, max, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False, 
-        unique=False)
-    generate_random_integers(count, min_value, max_value)
-    generate_random_string(length)
+
+    get_true_random_integers(count, min, max, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False,
+    unique=False)
+
+    generate_random_integers(count, min_value, max_value, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False,
+    
+    generate_random_string(length, valid_characters=_ALPHANUMERIC_CHARACTERS, unique=False)
+    
     check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False)
+
+    true_random_choice(choices_set, count=1, unique=False, timeout=10, api_key=_RANDOM_ORG_API_KEY)
 """
 
 import argparse

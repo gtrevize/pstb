@@ -81,12 +81,20 @@
 
 <span class="sd">Functions:</span>
 <span class="sd">    get_true_random_bytes(count, timeout=10, fail_on_error=False)</span>
-<span class="sd">    get_true_random_integers(count, min, max, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False, unique=False)</span>
-<span class="sd">    generate_random_integers(count, min_value, max_value)</span>
-<span class="sd">    generate_random_string(length)</span>
+
+<span class="sd">    get_true_random_integers(count, min, max, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False,</span>
+<span class="sd">    unique=False)</span>
+
+<span class="sd">    generate_random_integers(count, min_value, max_value, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False,</span>
+<span class="sd">    </span>
+<span class="sd">    generate_random_string(length, valid_characters=_ALPHANUMERIC_CHARACTERS, unique=False)</span>
+<span class="sd">    </span>
 <span class="sd">    check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False)</span>
+
+<span class="sd">    true_random_choice(choices_set, count=1, unique=False, timeout=10, api_key=_RANDOM_ORG_API_KEY)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">secrets</span>
 <span class="kn">import</span> <span class="nn">string</span>
@@ -160,7 +168,7 @@
 <span class="c1"># Constants</span>
 <span class="c1">###########</span>
 
-<span class="n">_RANDOM_ORG_API_KEY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_RANDOM_ORG_API_KEY&quot;</span><span class="p">))</span>
+<span class="n">_RANDOM_ORG_API_KEY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_RANDOM_ORG_API_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">_RANDOM_ORG_QUOTA_URL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://www.random.org/quota/?format=plain&quot;</span>
 <span class="n">_RANDOM_ORG_URL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://www.random.org/cgi-bin/randbyte?nbytes=</span><span class="si">{count}</span><span class="s2">&amp;format=h&quot;</span>
 <span class="n">_RANDOM_ORG_API_URL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://api.random.org/json-rpc/4/invoke&quot;</span>
@@ -189,7 +197,7 @@
 <span class="p">}</span>
 
 <span class="c1"># Define the default valid characters for the random string generator</span>
-<span class="n">_VALID_CHARACTERS</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span>
+<span class="n">_ALPHANUMERIC_CHARACTERS</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span>
 
 <span class="c1"># Define the maximum length of the random string generator</span>
 <span class="n">_MAX_STRING_LENGTH</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
@@ -300,7 +308,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nb">max</span> <span class="o">-</span> <span class="nb">min</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">unique</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">max</span> <span class="o">-</span> <span class="nb">min</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">fail_on_error</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;It is not possible to generate unique </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> random integers given the range </span><span class="si">{</span><span class="nb">min</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="nb">max</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -416,6 +424,12 @@
 <span class="sd">        api_key (str, optional): The API key to use for the request. If None, the value of the **_RANDOM_ORG_API_KEY**</span>
 <span class="sd">            environment variable will be used. Default is None.</span>
 
+<span class="sd">    Note:</span>
+<span class="sd">        If a dictionary is passed as choices_set, the choice will be made from the values of the dictionary.</span>
+<span class="sd">        It is not possible to make a choice from the keys of the dictionary.</span>
+<span class="sd">        Also it is assumed that the values of the dictionary are primitive types (int, str, etc.). If the values</span>
+<span class="sd">        are complex types a TypeError exception will be raised.</span>
+
 <span class="sd">    Yields:</span>
 <span class="sd">        Any: A random element of the given choices set. If unique is True the yielded elements will be unique.</span>
 
@@ -426,8 +440,9 @@
 <span class="sd">        random integers given the range.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        requests.exceptions.RequestException: If the request to random.org fails and fail_on_error is True.</span>
-<span class="sd">        requests.exceptions.Timeout: If the request to random.org times out and fail_on_error is True.</span>
+<span class="sd">        TypeError: If choices_set is not a list or a dictionary.</span>
+<span class="sd">        TypeError: If the values of the dictionary are not primitive types (int, float, str, bool, NoneType).</span>
+<span class="sd">        ValueError: If count is less than 1.</span>
 
 <span class="sd">    See Also:</span>
 <span class="sd">        :func:`get_true_random_integers` function for more information on how the random integers are generated</span>
@@ -447,26 +462,42 @@
 <span class="sd">        1</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check arguments sanity</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">choices_set</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">choices_set</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">choices_set</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="c1"># check if the values of the dictionary are primitive types</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">choice</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)))</span> <span class="k">for</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">choices_set</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The values of the dictionary must be primitive types (int, float, str, bool, NoneType)&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">choices_set</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;choices_set must be a list or a dictionary&quot;</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;count must be greater than 0&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Get the random integers</span>
     <span class="n">random_integers</span> <span class="o">=</span> <span class="n">get_true_random_integers</span><span class="p">(</span>
-        <span class="n">count</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">choices_set</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">count</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">choices_set</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="n">unique</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">random_integers</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
 
+    <span class="c1"># Return or yield the choices</span>
     <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">random_integers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">choices_set</span><span class="p">[</span><span class="n">random_integers</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">yield from</span> <span class="n">random_integers</span>
+        <span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="n">choices_set</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">random_integers</span><span class="p">]</span>
+        <span class="k">yield from</span> <span class="n">choices</span>
 
     <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># This is needed to avoid a warning from mypy</span></div>
 
 
 
-<div class="viewcode-block" id="generate_random_string">
-<a class="viewcode-back" href="../../../../src.pstb.number.html#src.pstb.number.pstb_random.generate_random_string">[docs]</a>
-<span class="k">def</span> <span class="nf">generate_random_string</span><span class="p">(</span>
-    <span class="n">length</span><span class="p">,</span> <span class="n">valid_characters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_VALID_CHARACTERS</span><span class="p">,</span> <span class="n">unique</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+<div class="viewcode-block" id="get_true_random_string">
+<a class="viewcode-back" href="../../../../src.pstb.number.html#src.pstb.number.pstb_random.get_true_random_string">[docs]</a>
+<span class="k">def</span> <span class="nf">get_true_random_string</span><span class="p">(</span>
+    <span class="n">length</span><span class="p">,</span> <span class="n">valid_characters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_ALPHANUMERIC_CHARACTERS</span><span class="p">,</span> <span class="n">unique</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates a random string of alphanumeric characters.</span>
@@ -474,7 +505,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        length (int): The length of the random string to generate. Must be between 1 and _MAX_STRING_LENGTH.</span>
 <span class="sd">        valid_characters (list[str] | str, optional): The list of valid characters to use for the random string.</span>
-<span class="sd">            default is _VALID_CHARACTERS which is equal to `string.ascii_letters + string.digits`.</span>
+<span class="sd">            default is _ALPHANUMERIC_CHARACTERS which is equal to `string.ascii_letters + string.digits`.</span>
 <span class="sd">        unique (bool, optional): If True, the generated string will be unique within this call. Default is False.</span>
 <span class="sd">        timeout (int, optional): The timeout for the function to complete. Default is 10 seconds.</span>
 
@@ -484,7 +515,8 @@
 <span class="sd">        None: If it is not possible to generate unique random integers given the range and the timeout.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If length is less than 1.</span>
+<span class="sd">        ValueError: If length is less than 1 or greater than _MAX_STRING_LENGTH.</span>
+<span class="sd">        ValueError: If length is greater than the number of valid characters and unique is True.</span>
 <span class="sd">        TypeError: If valid_characters is not a list or a string.</span>
 
 <span class="sd">    See Also:</span>
@@ -511,8 +543,14 @@
 <span class="sd">            &#39;cbbabccacc&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="c1"># Check arguments sanity</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">length</span> <span class="o">&lt;</span> <span class="n">_MAX_STRING_LENGTH</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;length must be between 1 and </span><span class="si">{</span><span class="n">_MAX_STRING_LENGTH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">unique</span> <span class="ow">and</span> <span class="p">(</span><span class="n">length</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_characters</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;length </span><span class="si">{</span><span class="n">length</span><span class="si">}</span><span class="s2"> must be less than or equal to the number of valid characters </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_characters</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">valid_characters</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">valid_characters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">valid_characters</span><span class="p">)</span>
@@ -521,6 +559,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;valid_characters must be a list or a string&quot;</span><span class="p">)</span>
 
+    <span class="c1"># Return the result</span>
     <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">true_random_choice</span><span class="p">(</span><span class="n">valid_characters</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
@@ -603,6 +642,77 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../../src.pstb.number.html#src.pstb.number.pstb_random.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Random Generator</span>
+
+<span class="sd">    This script generates random strings or random integers based on the provided arguments.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    -s, --string: Generate a random string</span>
+<span class="sd">    -l, --length: Length of the random string (default: 10)</span>
+<span class="sd">    -c, --count: Number of random strings to generate (default: 1)</span>
+<span class="sd">    -v, --valid-characters: Valid characters for the random string</span>
+<span class="sd">    -i, --integers: Generate random integers</span>
+<span class="sd">    -u, --unique: Generate unique random integers or strings</span>
+<span class="sd">    -t, --timeout: Timeout for the API request (default: 10)</span>
+<span class="sd">    -m, --min: Minimum value for random integers (default: 0)</span>
+<span class="sd">    -x, --max: Maximum value for random integers (default: 100)</span>
+<span class="sd">    -f, --fail-on-error: Fail on error when making API requests</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Random Generator&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;--string&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Generate a random string&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-l&quot;</span><span class="p">,</span> <span class="s2">&quot;--length&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Length of the random string. Default is 10&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;--count&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of random strings to generate. Default is 1&quot;</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--valid-characters&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Valid characters for the random string. Default is alphanumeric&quot;</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="s2">&quot;--integers&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Generate random integers&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-u&quot;</span><span class="p">,</span> <span class="s2">&quot;--unique&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Generate unique random integers or strings&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--timeout&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Timeout for the API request. Default is 10 seconds&quot;</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;--min&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Minimum value for random integers. Default is 0&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-x&quot;</span><span class="p">,</span> <span class="s2">&quot;--max&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Maximum value for random integers. Default is 100&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="s2">&quot;--fail-on-error&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Fail on error when making API requests&quot;</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">string</span><span class="p">:</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">length</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">length</span> <span class="k">else</span> <span class="mi">10</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">count</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">count</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">valid_characters</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">valid_characters</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">valid_characters</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">valid_characters</span><span class="p">:</span>
+                <span class="n">random_string</span> <span class="o">=</span> <span class="n">get_true_random_string</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">valid_characters</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">unique</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">random_string</span> <span class="o">=</span> <span class="n">get_true_random_string</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">unique</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">random_string</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">integers</span><span class="p">:</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">count</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">count</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">min_value</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">min</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">min</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">max_value</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">max</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">max</span> <span class="k">else</span> <span class="mi">100</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">unique</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">unique</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="n">random_integers</span> <span class="o">=</span> <span class="n">get_true_random_integers</span><span class="p">(</span>
+            <span class="n">count</span><span class="p">,</span> <span class="n">min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="n">unique</span><span class="p">,</span> <span class="n">fail_on_error</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">fail_on_error</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">random_integers</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">print_usage</span><span class="p">()</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
            </div>
