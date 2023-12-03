@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.pstb.log package &mdash; pstb 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pstb
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">src.pstb.log package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.pstb.log.pstb_logger">src.pstb.log.pstb_logger module</a><ul>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.DatabaseHandler"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler</span></code></a><ul>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.DatabaseHandler.db_filename"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.db_filename</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.DatabaseHandler.log_name"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.log_name</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.DatabaseHandler.conn"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.conn</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.DatabaseHandler.cursor"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.cursor</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.DatabaseHandler.connect_to_database"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.connect_to_database()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.DatabaseHandler.emit"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.emit()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.DatabaseHandler.close"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.close()</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.close()</span></code></a></li>
+<li><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.connect_to_database()</span></code></a></li>
+<li><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.db_filename</span></code></a></li>
+<li><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.emit()</span></code></a></li>
+<li><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">DatabaseHandler.log_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.SuppressRepeatFilter"><code class="docutils literal notranslate"><span class="pre">SuppressRepeatFilter</span></code></a><ul>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.SuppressRepeatFilter.max_repetitions"><code class="docutils literal notranslate"><span class="pre">SuppressRepeatFilter.max_repetitions</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.SuppressRepeatFilter.filter"><code class="docutils literal notranslate"><span class="pre">SuppressRepeatFilter.filter()</span></code></a></li>
+<li><a class="reference internal" href="#id5"><code class="docutils literal notranslate"><span class="pre">SuppressRepeatFilter.filter()</span></code></a></li>
+<li><a class="reference internal" href="#id6"><code class="docutils literal notranslate"><span class="pre">SuppressRepeatFilter.max_repetitions</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.add_output_to_console"><code class="docutils literal notranslate"><span class="pre">add_output_to_console()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.add_output_to_database"><code class="docutils literal notranslate"><span class="pre">add_output_to_database()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.add_output_to_file"><code class="docutils literal notranslate"><span class="pre">add_output_to_file()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.get_log_level"><code class="docutils literal notranslate"><span class="pre">get_log_level()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.get_log_level_name"><code class="docutils literal notranslate"><span class="pre">get_log_level_name()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_default_handler"><code class="docutils literal notranslate"><span class="pre">set_default_handler()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_log_formatter"><code class="docutils literal notranslate"><span class="pre">set_log_formatter()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_log_level"><code class="docutils literal notranslate"><span class="pre">set_log_level()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_log_level_critical"><code class="docutils literal notranslate"><span class="pre">set_log_level_critical()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_log_level_debug"><code class="docutils literal notranslate"><span class="pre">set_log_level_debug()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_log_level_error"><code class="docutils literal notranslate"><span class="pre">set_log_level_error()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_log_level_info"><code class="docutils literal notranslate"><span class="pre">set_log_level_info()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_log_level_warning"><code class="docutils literal notranslate"><span class="pre">set_log_level_warning()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_output_to_console"><code class="docutils literal notranslate"><span class="pre">set_output_to_console()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_output_to_database"><code class="docutils literal notranslate"><span class="pre">set_output_to_database()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_output_to_file"><code class="docutils literal notranslate"><span class="pre">set_output_to_file()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.set_temporary_level"><code class="docutils literal notranslate"><span class="pre">set_temporary_level()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.setup_logger"><code class="docutils literal notranslate"><span class="pre">setup_logger()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.unbuffered_console_output"><code class="docutils literal notranslate"><span class="pre">unbuffered_console_output()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.log.pstb_logger.unbuffered_file_output"><code class="docutils literal notranslate"><span class="pre">unbuffered_file_output()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-src.pstb.log">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pstb</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">src.pstb.log package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.pstb.log.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="src-pstb-log-package">
+<h1>src.pstb.log package<a class="headerlink" href="#src-pstb-log-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-src.pstb.log.pstb_logger">
+<span id="src-pstb-log-pstb-logger-module"></span><h2>src.pstb.log.pstb_logger module<a class="headerlink" href="#module-src.pstb.log.pstb_logger" title="Link to this heading"></a></h2>
+<p>This module provides a global logger instance that can be used by all modules in the project.
+Functions are provided to set the log level and output to console or file.</p>
+<dl class="simple">
+<dt>Classes:</dt><dd><p>DatabaseHandler: A handler that writes log records to a SQLite database.
+SuppressRepeatFilter: A filter that suppresses repeated log messages.</p>
+</dd>
+<dt>Functions:</dt><dd><p>setup_logger: Sets up the global logger instance.
+set_default_handler: Sets the default handler for the global logger instance.
+set_log_level: Sets the log level of the global logger instance.
+set_temporary_level: Sets a temporary log level for the global logger instance.
+get_log_level: Returns the current log level of the global logger instance.
+set_log_level_debug: Sets the log level to DEBUG.
+set_log_level_info: Sets the log level to INFO.
+set_log_level_warning: Sets the log level to WARNING.
+set_log_level_error: Sets the log level to ERROR.
+set_log_level_critical: Sets the log level to CRITICAL.
+set_output_to_console: Sets the output of the global logger instance to console.
+set_output_to_file: Sets the output of the global logger instance to a file.</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.DatabaseHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">DatabaseHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#DatabaseHandler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.DatabaseHandler" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Handler</span></code></p>
+<p>Creates a handler that writes log records to a SQLite database.
+The database filename can be specified as an argument or read from the PYTHON_LOG_DATABASE environment variable.
+The default filename is the name of the current file with a _log.db suffix and extension.
+Registers a function to close the database when the program exits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db_filename</strong> – The filename of the SQLite database. Defaults to the value of the PYTHON_LOG_DATABASE environment
+variable or the name of the current file with a _log.db suffix and extension.</p></li>
+<li><p><strong>dont_create</strong> – If True, the database file must already exist. Defaults to False.</p></li>
+<li><p><strong>log_name</strong> – The name of the log table in the database. Defaults to the name of the current file.</p></li>
+<li><p><strong>formatter</strong> – The formatter to use for the log records. Defaults to a simple formatter.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.DatabaseHandler.db_filename">
+<span class="sig-name descname"><span class="pre">db_filename</span></span><a class="headerlink" href="#src.pstb.log.pstb_logger.DatabaseHandler.db_filename" title="Link to this definition"></a></dt>
+<dd><p>The filename of the SQLite database.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.DatabaseHandler.log_name">
+<span class="sig-name descname"><span class="pre">log_name</span></span><a class="headerlink" href="#src.pstb.log.pstb_logger.DatabaseHandler.log_name" title="Link to this definition"></a></dt>
+<dd><p>The name of the log table in the database.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.DatabaseHandler.conn">
+<span class="sig-name descname"><span class="pre">conn</span></span><a class="headerlink" href="#src.pstb.log.pstb_logger.DatabaseHandler.conn" title="Link to this definition"></a></dt>
+<dd><p>The connection to the SQLite database.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.DatabaseHandler.cursor">
+<span class="sig-name descname"><span class="pre">cursor</span></span><a class="headerlink" href="#src.pstb.log.pstb_logger.DatabaseHandler.cursor" title="Link to this definition"></a></dt>
+<dd><p>The cursor for the SQLite database.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.DatabaseHandler.connect_to_database">
+<span class="sig-name descname"><span class="pre">connect_to_database</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#DatabaseHandler.connect_to_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.DatabaseHandler.connect_to_database" title="Link to this definition"></a></dt>
+<dd><p>Connects to the SQLite database.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.DatabaseHandler.emit">
+<span class="sig-name descname"><span class="pre">emit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#DatabaseHandler.emit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.DatabaseHandler.emit" title="Link to this definition"></a></dt>
+<dd><p>Inserts a log record into the database.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.DatabaseHandler.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#DatabaseHandler.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.DatabaseHandler.close" title="Link to this definition"></a></dt>
+<dd><p>Closes the connection to the SQLite database.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>FileNotFoundError</strong> – If the database file does not exist.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#DatabaseHandler.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Closes the connection to the SQLite database.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">connect_to_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dont_create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#DatabaseHandler.connect_to_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd><p>Connects to the SQLite database specified in the db_filename property.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dont_create</strong> – If True, the database file must already exist. Defaults to False.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If dont_create is True and the database file does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id2">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">db_filename</span></span><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">emit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#DatabaseHandler.emit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dd><p>Do whatever it takes to actually log the specified logging record.</p>
+<p>This version is intended to be implemented by subclasses and so
+raises a NotImplementedError.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id4">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log_name</span></span><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.SuppressRepeatFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">SuppressRepeatFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_repetitions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#SuppressRepeatFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.SuppressRepeatFilter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></p>
+<p>Suppresses repeated log messages.
+If a log message is repeated more than the maximum number of repetitions, the message is suppressed.
+Reads the maximum number of repetitions from the PYTHON_LOG_MAX_REPETITIONS environment variable or uses the
+default value of 3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>max_repetitions</strong> – The maximum number of repetitions to allow before suppressing the message.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.SuppressRepeatFilter.max_repetitions">
+<span class="sig-name descname"><span class="pre">max_repetitions</span></span><a class="headerlink" href="#src.pstb.log.pstb_logger.SuppressRepeatFilter.max_repetitions" title="Link to this definition"></a></dt>
+<dd><p>The maximum number of repetitions to allow before suppressing the message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.SuppressRepeatFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#SuppressRepeatFilter.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.SuppressRepeatFilter.filter" title="Link to this definition"></a></dt>
+<dd><p>Filters log records based on the number of repetitions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#SuppressRepeatFilter.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<dd><p>Determine if the specified record is to be logged.</p>
+<p>Returns True if the record should be logged, or False otherwise.
+If deemed appropriate, the record may be modified in-place.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id6">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_repetitions</span></span><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.add_output_to_console">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">add_output_to_console</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#add_output_to_console"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.add_output_to_console" title="Link to this definition"></a></dt>
+<dd><p>Adds a console handler to the global logger instance.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.add_output_to_database">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">add_output_to_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#add_output_to_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.add_output_to_database" title="Link to this definition"></a></dt>
+<dd><p>Adds a database handler to the global logger instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db_filename</strong> – The filename of the SQLite database.</p></li>
+<li><p><strong>dont_create</strong> – If True, the database file must already exist. Defaults to False.</p></li>
+<li><p><strong>log_name</strong> – The name of the log table in the database. Defaults to the name of the current file.</p></li>
+<li><p><strong>formatter</strong> – The formatter to use for the log records. Defaults to a simple formatter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.add_output_to_file">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">add_output_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#add_output_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.add_output_to_file" title="Link to this definition"></a></dt>
+<dd><p>Adds a file handler to the global logger instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – The path to the log file.</p></li>
+<li><p><strong>dont_create</strong> – If True, the file must already exist. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If dont_create is True and the file does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.get_log_level">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">get_log_level</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#get_log_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.get_log_level" title="Link to this definition"></a></dt>
+<dd><p>Returns the current log level of the global logger or None if the logger is not set up.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.get_log_level_name">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">get_log_level_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#get_log_level_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.get_log_level_name" title="Link to this definition"></a></dt>
+<dd><p>Returns the current log level name of the global logger or None if the logger is not set up.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_default_handler">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_default_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_default_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_default_handler" title="Link to this definition"></a></dt>
+<dd><p>Sets the default handler for the global logger instance.
+Uses a color formatter for console output.
+Removes all existing handlers and adds the new handler to the logger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>handler</strong> – The handler to set as the default handler.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_log_formatter">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_log_formatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format_str</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{log_color}{levelname:8s}</span> <span class="pre">{module:20s}:{funcName:20s}:{lineno:4d}</span> <span class="pre">-</span> <span class="pre">{reset}{message}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'CRITICAL':</span> <span class="pre">'red,bg_white',</span> <span class="pre">'DEBUG':</span> <span class="pre">'cyan',</span> <span class="pre">'ERROR':</span> <span class="pre">'red',</span> <span class="pre">'INFO':</span> <span class="pre">'green',</span> <span class="pre">'WARNING':</span> <span class="pre">'yellow'}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_log_formatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_log_formatter" title="Link to this definition"></a></dt>
+<dd><p>Sets the formatter for the global logger instance.
+Supports colorized output for console output and will automatically set the formatter for all existing handlers.
+Colorized will be applied only to the handlers that support it. For example, the StreamHandler supports it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>format_str</strong> – The format string to use for the formatter. Defaults to _FORMAT_COLOR_STR.
+It uses the new style string formatting with curly braces {} instead of ()%.</p></li>
+<li><p><strong>colorize</strong> – If True, colorize the output. Defaults to True.</p></li>
+<li><p><strong>log_colors</strong> – A dictionary of log colors. Defaults to _LOG_COLORS.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_log_level">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_log_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_log_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_log_level" title="Link to this definition"></a></dt>
+<dd><p>Sets the log level of the global logger.
+Valid levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>level</strong> – The log level to set.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the level is not a valid logging level.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_log_level_critical">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_log_level_critical</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_log_level_critical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_log_level_critical" title="Link to this definition"></a></dt>
+<dd><p>Sets the log level to CRITICAL.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_log_level_debug">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_log_level_debug</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_log_level_debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_log_level_debug" title="Link to this definition"></a></dt>
+<dd><p>Sets the log level to DEBUG.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_log_level_error">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_log_level_error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_log_level_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_log_level_error" title="Link to this definition"></a></dt>
+<dd><p>Sets the log level to ERROR.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_log_level_info">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_log_level_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_log_level_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_log_level_info" title="Link to this definition"></a></dt>
+<dd><p>Sets the log level to INFO.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_log_level_warning">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_log_level_warning</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_log_level_warning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_log_level_warning" title="Link to this definition"></a></dt>
+<dd><p>Sets the log level to WARNING.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_output_to_console">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_output_to_console</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_output_to_console"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_output_to_console" title="Link to this definition"></a></dt>
+<dd><p>Sets the output of the global logger instance to console.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_output_to_database">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_output_to_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_output_to_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_output_to_database" title="Link to this definition"></a></dt>
+<dd><p>Sets the output of the global logger instance to a database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db_filename</strong> – The filename of the SQLite database.</p></li>
+<li><p><strong>dont_create</strong> – If True, the database file must already exist. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If the database file does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_output_to_file">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_output_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_create</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_output_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_output_to_file" title="Link to this definition"></a></dt>
+<dd><p>Sets the output of the global logger instance to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> – The path to the log file.</p></li>
+<li><p><strong>dont_create</strong> – If True, the file must already exist. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If dont_create is True and the file does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.set_temporary_level">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">set_temporary_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#set_temporary_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.set_temporary_level" title="Link to this definition"></a></dt>
+<dd><p>Sets a temporary log level for the global logger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_level</strong> – The log level to set temporarily.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.setup_logger">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">setup_logger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#setup_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.setup_logger" title="Link to this definition"></a></dt>
+<dd><p>Sets up the global logger instance.
+Sets the log level and output based on environment variables.
+Default log level is INFO.
+Default log output is console.
+Default log file is the name of the current file with a .log extension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The global logger instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.unbuffered_console_output">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">unbuffered_console_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#unbuffered_console_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.unbuffered_console_output" title="Link to this definition"></a></dt>
+<dd><p>Temporary changes the console output to unbuffered mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream_name</strong> – The name of the stream to change. Must be either ‘stdout’ or ‘stderr’.</p></li>
+<li><p><strong>'stdout'.</strong> (<em>Defaults to</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the stream name is not ‘stdout’ or ‘stderr’.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.log.pstb_logger.unbuffered_file_output">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.log.pstb_logger.</span></span><span class="sig-name descname"><span class="pre">unbuffered_file_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/log/pstb_logger.html#unbuffered_file_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.log.pstb_logger.unbuffered_file_output" title="Link to this definition"></a></dt>
+<dd><p>Temporary changes the file output to unbuffered mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> – The path to the file to change.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If the file does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.pstb.log">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.pstb.log" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, gtrevize.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.pstb.file.pstb_file &mdash; pstb 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pstb
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pstb</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.pstb.file.pstb_file</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.pstb.file.pstb_file</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">file_utilities.py - File Utilities Module</span>
+
+<span class="sd">This module provides utility functions for working with files and directories, including file access checks,</span>
+<span class="sd">recursive file retrieval, and access control.</span>
+
+<span class="sd">Functions:</span>
+<span class="sd">    check_access(file_path, access_type):</span>
+<span class="sd">        Checks if a file has the specified access type.</span>
+
+<span class="sd">    get_files(path, include_pattern=None, exclude_patterns=None, max_depth=0, follow_symlinks=False, access_type=&quot;r&quot;):</span>
+<span class="sd">        Recursively retrieves a list of files in a directory based on include/exclude patterns and access type.</span>
+
+<span class="sd">    format_output(result, output_format):</span>
+<span class="sd">        Formats the result based on the specified output format.</span>
+
+<span class="sd">    find_root_module(module):</span>
+<span class="sd">        Finds the root directory of a given module.</span>
+
+<span class="sd">More information about the functions can be found in their docstrings.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypedDict</span>
+
+<span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+
+<span class="c1"># Add the src directory to the PYTHONPATH</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;src&quot;</span><span class="p">)))</span>
+
+<span class="kn">from</span> <span class="nn">pstb.console.pstb_console</span> <span class="kn">import</span> <span class="n">pretty_json</span>  <span class="c1"># noqa: E402</span>
+<span class="kn">from</span> <span class="nn">pstb.string.pstb_string</span> <span class="kn">import</span> <span class="n">dict_to_csv_str</span><span class="p">,</span> <span class="n">dict_to_html_str</span>  <span class="c1"># noqa: E402</span>
+
+<span class="c1">#############</span>
+<span class="c1"># Type hints</span>
+<span class="c1">#############</span>
+
+
+<div class="viewcode-block" id="FileDetailsDict">
+<a class="viewcode-back" href="../../../../src.pstb.file.html#src.pstb.file.pstb_file.FileDetailsDict">[docs]</a>
+<span class="k">class</span> <span class="nc">FileDetailsDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Type hint for the dictionary returned by get_file_details.&quot;&quot;&quot;</span>
+
+    <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">file_real_path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">file_extension</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">file_size</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">file_access</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">file_modified</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">file_created</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">file_owner</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">file_group</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">file_permissions</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="MatchingFilesDict">
+<a class="viewcode-back" href="../../../../src.pstb.file.html#src.pstb.file.pstb_file.MatchingFilesDict">[docs]</a>
+<span class="k">class</span> <span class="nc">MatchingFilesDict</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Type hint for the dictionary returned by get_files.&quot;&quot;&quot;</span>
+
+    <span class="n">total_files</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">returned_files</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">excluded_files</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">access_denied_files</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">errors_found</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">max_depth</span><span class="p">:</span> <span class="nb">int</span>  <span class="c1"># Maximum depth of recursion allowed</span>
+    <span class="n">actual_depth</span><span class="p">:</span> <span class="nb">int</span>  <span class="c1"># Actual depth of recursion used</span>
+    <span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FileDetailsDict</span><span class="p">]</span>  <span class="c1"># List of files that meet the specified access type and pattern criteria</span></div>
+
+
+
+<span class="c1">###########</span>
+<span class="c1"># Functions</span>
+<span class="c1">###########</span>
+
+
+<div class="viewcode-block" id="check_access">
+<a class="viewcode-back" href="../../../../src.pstb.file.html#src.pstb.file.pstb_file.check_access">[docs]</a>
+<span class="k">def</span> <span class="nf">check_access</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">access_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if a file has the specified access type.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (str): The path to the file.</span>
+<span class="sd">        access_type (str): Access type to check. &quot;r&quot; for reading, &quot;w&quot; for writing, &quot;rw&quot; for both.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the file has the specified access type, False otherwise.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; check_access(&quot;my_file.txt&quot;, &quot;r&quot;)</span>
+<span class="sd">        True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">access_type</span> <span class="o">==</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">access_type</span> <span class="o">==</span> <span class="s2">&quot;w&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">W_OK</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">access_type</span> <span class="o">==</span> <span class="s2">&quot;rw&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">W_OK</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">PermissionError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">):</span>
+        <span class="c1"># Handle permission errors or missing files by returning False</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="get_files">
+<a class="viewcode-back" href="../../../../src.pstb.file.html#src.pstb.file.pstb_file.get_files">[docs]</a>
+<span class="k">def</span> <span class="nf">get_files</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">include_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude_patterns</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">follow_symlinks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">access_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursively retrieves a list of files in a directory based on include/exclude patterns and access type.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): The path to the directory or file to start searching from.</span>
+<span class="sd">        include_pattern (str, optional): Pattern to include files (e.g., &#39;\\*.txt&#39;). Default is None (include all).</span>
+<span class="sd">        exclude_patterns (list of str, optional): List of patterns to exclude files (e.g., [&#39;\\*.jpg&#39;, &#39;\\*.png&#39;]).</span>
+<span class="sd">            Default is None (no exclusions).</span>
+<span class="sd">        max_depth (int, optional): Maximum depth of recursion. Default is 0 (infinite).</span>
+<span class="sd">        follow_symlinks (bool, optional): Whether to follow symbolic links. Default is False.</span>
+<span class="sd">        access_type (str, optional): Access type to check for each file. &quot;r&quot; for reading, &quot;w&quot; for writing, &quot;rw&quot;</span>
+<span class="sd">            for both. Default is &quot;r&quot;.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the path is invalid.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary containing file information as specified.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">matching_files</span><span class="p">:</span> <span class="n">MatchingFilesDict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;total_files&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;returned_files&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;excluded_files&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;access_denied_files&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;max_depth&quot;</span><span class="p">:</span> <span class="n">max_depth</span><span class="p">,</span>
+        <span class="s2">&quot;actual_depth&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;errors_found&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+    <span class="n">actual_depth</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="n">check_access</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">access_type</span><span class="p">):</span>
+        <span class="n">matching_files</span><span class="p">[</span><span class="s2">&quot;total_files&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">matching_files</span><span class="p">[</span><span class="s2">&quot;returned_files&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">matching_files</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_file_details</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">followlinks</span><span class="o">=</span><span class="n">follow_symlinks</span><span class="p">):</span>
+            <span class="n">current_depth</span> <span class="o">=</span> <span class="n">root</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>  <span class="c1"># noqa: E203</span>
+            <span class="k">if</span> <span class="n">current_depth</span> <span class="o">&gt;</span> <span class="n">actual_depth</span><span class="p">:</span>
+                <span class="n">actual_depth</span> <span class="o">=</span> <span class="n">current_depth</span>
+            <span class="k">if</span> <span class="n">max_depth</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">current_depth</span> <span class="o">&lt;=</span> <span class="n">max_depth</span><span class="p">:</span>
+                <span class="c1"># Include files based on patterns (include takes precedence over exclude)</span>
+                <span class="k">if</span> <span class="n">include_pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">files_to_include</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">include_pattern</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">files_to_include</span> <span class="o">=</span> <span class="n">files</span>
+
+                <span class="c1"># Exclude files based on patterns</span>
+                <span class="k">if</span> <span class="n">exclude_patterns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">files_to_include</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="n">f</span>
+                        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files_to_include</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">exclude_patterns</span><span class="p">)</span>
+                    <span class="p">]</span>
+
+                <span class="n">matching_files</span><span class="p">[</span><span class="s2">&quot;total_files&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+                <span class="n">matching_files</span><span class="p">[</span><span class="s2">&quot;excluded_files&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">files_to_include</span><span class="p">)</span>
+
+                <span class="c1"># Check access and add to the list if allowed</span>
+                <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">files_to_include</span><span class="p">:</span>
+                    <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+                    <span class="n">matching_files</span><span class="p">[</span><span class="s2">&quot;total_files&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">check_access</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">access_type</span><span class="p">):</span>
+                        <span class="n">matching_files</span><span class="p">[</span><span class="s2">&quot;returned_files&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">matching_files</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_file_details</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">matching_files</span><span class="p">[</span><span class="s2">&quot;access_denied_files&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid path: &#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+    <span class="n">matching_files</span><span class="p">[</span><span class="s2">&quot;actual_depth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">actual_depth</span>
+
+    <span class="k">return</span> <span class="n">matching_files</span></div>
+
+
+
+<div class="viewcode-block" id="get_file_details">
+<a class="viewcode-back" href="../../../../src.pstb.file.html#src.pstb.file.pstb_file.get_file_details">[docs]</a>
+<span class="k">def</span> <span class="nf">get_file_details</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FileDetailsDict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets details about a file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (str): The path to the file.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        OSError: If the file doesn&#39;t exist or is inaccessible.</span>
+<span class="sd">        FileNotFoundError: If the file doesn&#39;t exist or is inaccessible.</span>
+<span class="sd">        PermissionError: If access to the file is denied.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary containing the following file details:</span>
+<span class="sd">            - file_path: The full path to the file.</span>
+<span class="sd">            - file_reaL_path: The full real path to the file, after resolving any symbolic links.</span>
+<span class="sd">            - file_name: The name of the file.</span>
+<span class="sd">            - file_extension: The extension of the file.</span>
+<span class="sd">            - file_size: The size of the file in bytes.</span>
+<span class="sd">            - file_access: The access type of the file (&quot;r&quot;, &quot;w&quot;, &quot;x&quot;, or a combination of those).</span>
+<span class="sd">            - file_modified: The date and time the file was last modified.</span>
+<span class="sd">            - file_created: The date and time the file was created.</span>
+<span class="sd">            - file_owner: The owner of the file.</span>
+<span class="sd">            - file_group: The group of the file.</span>
+<span class="sd">            - file_permissions: The permissions of the file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">FileDetailsDict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;file_real_path&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;file_extension&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;file_size&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;file_access&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;file_modified&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;file_created&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;file_owner&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;file_group&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;file_permissions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_real_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_extension&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_access&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;r&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">W_OK</span><span class="p">):</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_access&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;w&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">):</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_access&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;x&quot;</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&#39; doesn&#39;t exist or is inaccessible&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Access denied to file &#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_modified&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_created&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getctime</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_owner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">st_uid</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_group&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">st_gid</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;file_permissions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">oct</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">st_mode</span> <span class="o">&amp;</span> <span class="mo">0o777</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to get file details for &#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="format_output">
+<a class="viewcode-back" href="../../../../src.pstb.file.html#src.pstb.file.pstb_file.format_output">[docs]</a>
+<span class="k">def</span> <span class="nf">format_output</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">MatchingFilesDict</span><span class="p">,</span> <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;plain&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Formats the result based on the specified output format.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        result (dict): The result to format.</span>
+<span class="sd">        output_format (str): The output format to use. One of &quot;plain&quot;, &quot;text&quot;, &quot;json&quot;, &quot;csv&quot;, &quot;html&quot;, &quot;json-pretty&quot;.</span>
+<span class="sd">            text: Tabular output using the tabulate library.</span>
+<span class="sd">            csv: Only the &quot;files&quot; key is formatted as a string with newline characters separating the file paths.</span>
+<span class="sd">            pretty-json: JSON output with indentation and colored output, using the colorama library.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the output format is not one of the valid options.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The formatted result.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;plain&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tabulate</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;grid&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
+        <span class="n">result_files</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">])</span>  <span class="c1"># conversion to list is required for mypy</span>
+        <span class="k">return</span> <span class="n">dict_to_csv_str</span><span class="p">(</span><span class="n">result_files</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;html&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dict_to_html_str</span><span class="p">(</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># Convert to a regular dict before passing to dict_to_html_str to avoid type error</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s2">&quot;json-pretty&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pretty_json</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>  <span class="c1"># Convert to a regular dict before passing to pretty_json to avoid type error</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid output format: </span><span class="si">{</span><span class="n">output_format</span><span class="si">}</span><span class="s2">. Valid formats are: plain, text, json, csv, html&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="find_root_module">
+<a class="viewcode-back" href="../../../../src.pstb.file.html#src.pstb.file.pstb_file.find_root_module">[docs]</a>
+<span class="k">def</span> <span class="nf">find_root_module</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds the root directory of a given module.</span>
+
+<span class="sd">    This function navigates up the directory tree of the provided module&#39;s file path until</span>
+<span class="sd">    it reaches a directory without an `__init__.py` file, which is typically the root of</span>
+<span class="sd">    the package. The root directory is then returned.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        module (ModuleType): The module for which to find the root directory. This should</span>
+<span class="sd">            be a reference to the module, not the module&#39;s name as a string.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The file path representing the root directory of the module&#39;s package.</span>
+<span class="sd">            If the module is not part of a package, the directory containing the module file is returned.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; root_path = find_root_module(my_library)</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;Root path of the library:&quot;, root_path)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the file path of the module</span>
+    <span class="n">module_file_path</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="vm">__file__</span>
+
+    <span class="c1"># Navigate up the directory structure to find the package root</span>
+    <span class="n">current_path</span> <span class="o">=</span> <span class="n">module_file_path</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">current_path</span><span class="p">,</span> <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">current_dir</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="s2">&quot;__init__.py&quot;</span><span class="p">)):</span>
+            <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">current_path</span></div>
+
+
+
+<span class="c1">######</span>
+<span class="c1"># Main</span>
+<span class="c1">######</span>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../../src.pstb.file.html#src.pstb.file.pstb_file.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main function for the file_utilities command-line utility.</span>
+<span class="sd">    This function parses command-line arguments and calls the appropriate functions.</span>
+<span class="sd">    The valid command-line arguments are as follows:</span>
+
+<span class="sd">        -i, --include-pattern: Pattern to include files (e.g., &#39;\\*.txt&#39;). Default is None (include all).</span>
+<span class="sd">        -e, --exclude-patterns: List of patterns to exclude files (e.g., &#39;\\*.jpg&#39;). Default is None (no exclusions).</span>
+<span class="sd">        -d, --max-depth: Maximum depth of recursion. Default is 0 (infinite).</span>
+<span class="sd">        -s, --follow-symlinks: Whether to follow symbolic links. Default is False.</span>
+<span class="sd">        -a, --access-type: Access type to check. &#39;r&#39; for reading, &#39;w&#39; for writing, &#39;rw&#39; for both. Default is &#39;r&#39;.</span>
+<span class="sd">        -f, --format: Output format. Default is &#39;plain&#39;.</span>
+<span class="sd">        -o, --output: Output file name. Writes to stdout if not specified.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;File Utilities Command-Line Utility&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The path to the directory or file to start searching from.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--include-pattern&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pattern to include files (e.g., &#39;</span><span class="se">\\</span><span class="s2">*.txt&#39;). Default is None (include all).&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--exclude-patterns&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;List of patterns to exclude files (e.g., &#39;</span><span class="se">\\</span><span class="s2">*.jpg&#39;). Default is None (no exclusions).&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-d&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--max-depth&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Maximum depth of recursion. Default is 0 (infinite).&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--follow-symlinks&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether to follow symbolic links. Default is False.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--access-type&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;rw&quot;</span><span class="p">],</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Access type to check for each file. &#39;r&#39; for reading, &#39;w&#39; for writing, &#39;rw&#39; for both. Default is &#39;r&#39;.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-f&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--format&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;plain&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;html&quot;</span><span class="p">,</span> <span class="s2">&quot;json-pretty&quot;</span><span class="p">],</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;plain&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Output format. Default is &#39;plain&#39;.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;--output&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Output file name. Writes to stdout if not specified.&quot;</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">get_files</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+            <span class="n">include_pattern</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">include_pattern</span><span class="p">,</span>
+            <span class="n">exclude_patterns</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">exclude_patterns</span><span class="p">,</span>
+            <span class="n">max_depth</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_depth</span><span class="p">,</span>
+            <span class="n">follow_symlinks</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">follow_symlinks</span><span class="p">,</span>
+            <span class="n">access_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">access_type</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">formatted_output</span> <span class="o">=</span> <span class="n">format_output</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">output</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output_file</span><span class="p">:</span>
+                <span class="n">output_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">formatted_output</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">formatted_output</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, gtrevize.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

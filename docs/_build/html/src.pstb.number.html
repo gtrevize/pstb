@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.pstb.number package &mdash; pstb 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pstb
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">src.pstb.number package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.pstb.number.pstb_random">src.pstb.number.pstb_random module</a><ul>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.IntegerPayloadParams"><code class="docutils literal notranslate"><span class="pre">IntegerPayloadParams</span></code></a><ul>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.IntegerPayloadParams.apiKey"><code class="docutils literal notranslate"><span class="pre">IntegerPayloadParams.apiKey</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.IntegerPayloadParams.max"><code class="docutils literal notranslate"><span class="pre">IntegerPayloadParams.max</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.IntegerPayloadParams.min"><code class="docutils literal notranslate"><span class="pre">IntegerPayloadParams.min</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.IntegerPayloadParams.n"><code class="docutils literal notranslate"><span class="pre">IntegerPayloadParams.n</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.IntegerPayloadParams.replacement"><code class="docutils literal notranslate"><span class="pre">IntegerPayloadParams.replacement</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.QuotaPayloadParams"><code class="docutils literal notranslate"><span class="pre">QuotaPayloadParams</span></code></a><ul>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.QuotaPayloadParams.apiKey"><code class="docutils literal notranslate"><span class="pre">QuotaPayloadParams.apiKey</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.RandomOrgIntegersPayload"><code class="docutils literal notranslate"><span class="pre">RandomOrgIntegersPayload</span></code></a><ul>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.RandomOrgIntegersPayload.id"><code class="docutils literal notranslate"><span class="pre">RandomOrgIntegersPayload.id</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.RandomOrgIntegersPayload.jsonrpc"><code class="docutils literal notranslate"><span class="pre">RandomOrgIntegersPayload.jsonrpc</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.RandomOrgIntegersPayload.method"><code class="docutils literal notranslate"><span class="pre">RandomOrgIntegersPayload.method</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.RandomOrgIntegersPayload.params"><code class="docutils literal notranslate"><span class="pre">RandomOrgIntegersPayload.params</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.RandomOrgQuotaPayload"><code class="docutils literal notranslate"><span class="pre">RandomOrgQuotaPayload</span></code></a><ul>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.RandomOrgQuotaPayload.id"><code class="docutils literal notranslate"><span class="pre">RandomOrgQuotaPayload.id</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.RandomOrgQuotaPayload.jsonrpc"><code class="docutils literal notranslate"><span class="pre">RandomOrgQuotaPayload.jsonrpc</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.RandomOrgQuotaPayload.method"><code class="docutils literal notranslate"><span class="pre">RandomOrgQuotaPayload.method</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.RandomOrgQuotaPayload.params"><code class="docutils literal notranslate"><span class="pre">RandomOrgQuotaPayload.params</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.check_random_org_quota"><code class="docutils literal notranslate"><span class="pre">check_random_org_quota()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.generate_random_integers"><code class="docutils literal notranslate"><span class="pre">generate_random_integers()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.generate_random_string"><code class="docutils literal notranslate"><span class="pre">generate_random_string()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.get_true_random_bytes"><code class="docutils literal notranslate"><span class="pre">get_true_random_bytes()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.number.pstb_random.get_true_random_integers"><code class="docutils literal notranslate"><span class="pre">get_true_random_integers()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-src.pstb.number">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pstb</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">src.pstb.number package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.pstb.number.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="src-pstb-number-package">
+<h1>src.pstb.number package<a class="headerlink" href="#src-pstb-number-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-src.pstb.number.pstb_random">
+<span id="src-pstb-number-pstb-random-module"></span><h2>src.pstb.number.pstb_random module<a class="headerlink" href="#module-src.pstb.number.pstb_random" title="Link to this heading"></a></h2>
+<p>This module provides functions to generate random numbers and strings.
+It uses random.org as a source of true random numbers.
+If that fails, it falls back to pseudo-random numbers using urandom.</p>
+<dl class="simple">
+<dt>Functions:</dt><dd><p>get_true_random_bytes(count, timeout=10, fail_on_error=False)
+get_true_random_integers(count, min, max, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False, unique=False)
+generate_random_integers(count, min_value, max_value)
+generate_random_string(length)
+check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False)</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.IntegerPayloadParams">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">IntegerPayloadParams</span></span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#IntegerPayloadParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.IntegerPayloadParams" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Type hint for the params field of the JSON-RPC request payload to generate integers</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.IntegerPayloadParams.apiKey">
+<span class="sig-name descname"><span class="pre">apiKey</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.pstb.number.pstb_random.IntegerPayloadParams.apiKey" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.IntegerPayloadParams.max">
+<span class="sig-name descname"><span class="pre">max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.number.pstb_random.IntegerPayloadParams.max" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.IntegerPayloadParams.min">
+<span class="sig-name descname"><span class="pre">min</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.number.pstb_random.IntegerPayloadParams.min" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.IntegerPayloadParams.n">
+<span class="sig-name descname"><span class="pre">n</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.number.pstb_random.IntegerPayloadParams.n" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.IntegerPayloadParams.replacement">
+<span class="sig-name descname"><span class="pre">replacement</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#src.pstb.number.pstb_random.IntegerPayloadParams.replacement" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.QuotaPayloadParams">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">QuotaPayloadParams</span></span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#QuotaPayloadParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.QuotaPayloadParams" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Type hint for the params field of the JSON-RPC request to check the quota</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.QuotaPayloadParams.apiKey">
+<span class="sig-name descname"><span class="pre">apiKey</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.pstb.number.pstb_random.QuotaPayloadParams.apiKey" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.RandomOrgIntegersPayload">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">RandomOrgIntegersPayload</span></span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#RandomOrgIntegersPayload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.RandomOrgIntegersPayload" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Type hint for the JSON-RPC request payload to generate integers</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.RandomOrgIntegersPayload.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.number.pstb_random.RandomOrgIntegersPayload.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.RandomOrgIntegersPayload.jsonrpc">
+<span class="sig-name descname"><span class="pre">jsonrpc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'4.0'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#src.pstb.number.pstb_random.RandomOrgIntegersPayload.jsonrpc" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.RandomOrgIntegersPayload.method">
+<span class="sig-name descname"><span class="pre">method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'generateIntegers'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#src.pstb.number.pstb_random.RandomOrgIntegersPayload.method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.RandomOrgIntegersPayload.params">
+<span class="sig-name descname"><span class="pre">params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.pstb.number.pstb_random.IntegerPayloadParams" title="src.pstb.number.pstb_random.IntegerPayloadParams"><span class="pre">IntegerPayloadParams</span></a></em><a class="headerlink" href="#src.pstb.number.pstb_random.RandomOrgIntegersPayload.params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.RandomOrgQuotaPayload">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">RandomOrgQuotaPayload</span></span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#RandomOrgQuotaPayload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.RandomOrgQuotaPayload" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Type hint for the JSON-RPC request payload to retrieve the quota</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.RandomOrgQuotaPayload.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.number.pstb_random.RandomOrgQuotaPayload.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.RandomOrgQuotaPayload.jsonrpc">
+<span class="sig-name descname"><span class="pre">jsonrpc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'4.0'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#src.pstb.number.pstb_random.RandomOrgQuotaPayload.jsonrpc" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.RandomOrgQuotaPayload.method">
+<span class="sig-name descname"><span class="pre">method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'getUsage'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#src.pstb.number.pstb_random.RandomOrgQuotaPayload.method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.RandomOrgQuotaPayload.params">
+<span class="sig-name descname"><span class="pre">params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.pstb.number.pstb_random.QuotaPayloadParams" title="src.pstb.number.pstb_random.QuotaPayloadParams"><span class="pre">QuotaPayloadParams</span></a></em><a class="headerlink" href="#src.pstb.number.pstb_random.RandomOrgQuotaPayload.params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.check_random_org_quota">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">check_random_org_quota</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'None'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_on_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#check_random_org_quota"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.check_random_org_quota" title="Link to this definition"></a></dt>
+<dd><p>Checks if there is enough quota left on random.org.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<em>int</em>) – The number of bytes to fetch.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – The timeout for the request to random.org (in seconds). Default is 10 seconds.</p></li>
+<li><p><strong>api_key</strong> (<em>str</em><em>, </em><em>optional</em>) – The API key to use for the request. If None, the value of the _RANDOM_ORG_API_KEY.</p></li>
+<li><p><strong>fail_on_error</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, raise an exception if the request to random.org fails.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if there is enough quota left, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>requests.exceptions.RequestException</strong> – If the request to random.org fails and fail_on_error is True.</p></li>
+<li><p><strong>requests.exceptions.Timeout</strong> – If the request to random.org times out and fail_on_error is True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.generate_random_integers">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">generate_random_integers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#generate_random_integers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.generate_random_integers" title="Link to this definition"></a></dt>
+<dd><p>Generates a list of random integers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<em>int</em>) – The number of integers to generate.</p></li>
+<li><p><strong>min_value</strong> (<em>int</em>) – The smallest value allowed for each integer.</p></li>
+<li><p><strong>max_value</strong> (<em>int</em>) – The largest value allowed for each integer.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated random integers.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.generate_random_string">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">generate_random_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#generate_random_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.generate_random_string" title="Link to this definition"></a></dt>
+<dd><p>Generates a random string of alphanumeric characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>length</strong> (<em>int</em>) – The length of the random string to generate.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated random string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If length is less than 1.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.get_true_random_bytes">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">get_true_random_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_on_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#get_true_random_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.get_true_random_bytes" title="Link to this definition"></a></dt>
+<dd><p>Fetches true random bytes from random.org.
+If that fails falls back to pseudo-random numbers using urandom.
+Checks random.org quota before making the request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<em>int</em>) – The number of bytes to fetch.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – The timeout for the request to random.org (in seconds). Default is 10 seconds.</p></li>
+<li><p><strong>fail_on_error</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, raise an exception if the request to random.org fails.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The fetched random bytes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>requests.exceptions.RequestException</strong> – If the request to random.org fails and fail_on_error is True.</p></li>
+<li><p><strong>requests.exceptions.Timeout</strong> – If the request to random.org times out and fail_on_error is True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.number.pstb_random.get_true_random_integers">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.number.pstb_random.</span></span><span class="sig-name descname"><span class="pre">get_true_random_integers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'None'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_on_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/number/pstb_random.html#get_true_random_integers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.number.pstb_random.get_true_random_integers" title="Link to this definition"></a></dt>
+<dd><p>Fetches true random integers from random.org.
+Requires an API key, if none is provided, falls back to generating integers from random.org bytes.
+If that fails falls back to pseudo-random numbers using urandom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> (<em>int</em>) – The number of integers to fetch.</p></li>
+<li><p><strong>min</strong> (<em>int</em>) – The smallest value allowed for each integer.</p></li>
+<li><p><strong>max</strong> (<em>int</em>) – The largest value allowed for each integer.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – The timeout for the function to complete. If has to main uses:
+1) As a timeout for the request to random.org (in seconds).
+2) As a timeout for the function to complete (in seconds). This is used to ensure that the function
+does not run for too long, especially when generating unique random integers.
+Default is 10 seconds.</p></li>
+<li><p><strong>api_key</strong> (<em>str</em><em>, </em><em>optional</em>) – The API key to use for the request. If None, the value of the _RANDOM_ORG_API_KEY
+environment variable will be used. Default is None.</p></li>
+<li><p><strong>fail_on_error</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, raise an exception if the request to random.org fails.
+Default is False.</p></li>
+<li><p><strong>unique</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the fetched integers will be unique within this call. Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>The fetched random integers.
+None: If unique is True and and fail_on_error is False and it is not possible to</p>
+<blockquote>
+<div><p>generate unique random integers given the range.</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>requests.exceptions.RequestException</strong> – If the request to random.org fails and fail_on_error is True.</p></li>
+<li><p><strong>requests.exceptions.Timeout</strong> – If the request to random.org times out and fail_on_error is True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.pstb.number">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.pstb.number" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, gtrevize.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

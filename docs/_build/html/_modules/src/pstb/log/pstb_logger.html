@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.pstb.log.pstb_logger &mdash; pstb 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pstb
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pstb</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.pstb.log.pstb_logger</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.pstb.log.pstb_logger</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides a global logger instance that can be used by all modules in the project.</span>
+<span class="sd">Functions are provided to set the log level and output to console or file.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">    DatabaseHandler: A handler that writes log records to a SQLite database.</span>
+<span class="sd">    SuppressRepeatFilter: A filter that suppresses repeated log messages.</span>
+
+<span class="sd">Functions:</span>
+<span class="sd">    setup_logger: Sets up the global logger instance.</span>
+<span class="sd">    set_default_handler: Sets the default handler for the global logger instance.</span>
+<span class="sd">    set_log_level: Sets the log level of the global logger instance.</span>
+<span class="sd">    set_temporary_level: Sets a temporary log level for the global logger instance.</span>
+<span class="sd">    get_log_level: Returns the current log level of the global logger instance.</span>
+<span class="sd">    set_log_level_debug: Sets the log level to DEBUG.</span>
+<span class="sd">    set_log_level_info: Sets the log level to INFO.</span>
+<span class="sd">    set_log_level_warning: Sets the log level to WARNING.</span>
+<span class="sd">    set_log_level_error: Sets the log level to ERROR.</span>
+<span class="sd">    set_log_level_critical: Sets the log level to CRITICAL.</span>
+<span class="sd">    set_output_to_console: Sets the output of the global logger instance to console.</span>
+<span class="sd">    set_output_to_file: Sets the output of the global logger instance to a file.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">atexit</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">colorlog</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="c1"># Load environment variables from .env file</span>
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="c1"># Global variable to hold the logger instance, initialized to None because the logger is set up in setup_logger()</span>
+<span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ignore</span>
+
+<span class="c1">#######################</span>
+<span class="c1"># Constants definitions</span>
+<span class="c1">#######################</span>
+
+<span class="c1"># Tuple of integers of valid log levels for use in the set_log_level function</span>
+<span class="n">_VALID_LOG_LEVELS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>  <span class="c1"># NOTSET  # DEBUG  # INFO  # WARNING  # ERROR  # CRITICAL</span>
+<span class="n">_VALID_LOG_LEVELS_STR</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;NOTSET&quot;</span><span class="p">,</span> <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="s2">&quot;WARNING&quot;</span><span class="p">,</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s2">&quot;CRITICAL&quot;</span><span class="p">)</span>
+<span class="n">_VALID_LOG_LEVELS_DICT</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">_VALID_LOG_LEVELS_STR</span><span class="p">,</span> <span class="n">_VALID_LOG_LEVELS</span><span class="p">))</span>
+
+<span class="n">_LOG_COLORS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">:</span> <span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="s2">&quot;INFO&quot;</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;WARNING&quot;</span><span class="p">:</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;CRITICAL&quot;</span><span class="p">:</span> <span class="s2">&quot;red,bg_white&quot;</span><span class="p">}</span>
+
+<span class="n">_FORMAT_STR</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{levelname:8s}</span><span class="s2"> </span><span class="si">{module:20s}</span><span class="s2">:</span><span class="si">{funcName:20s}</span><span class="s2">:</span><span class="si">{lineno:4d}</span><span class="s2"> - </span><span class="si">{message}</span><span class="s2">&quot;</span>
+<span class="n">_FORMAT_COLOR_STR</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{log_color}{levelname:8s}</span><span class="s2"> </span><span class="si">{module:20s}</span><span class="s2">:</span><span class="si">{funcName:20s}</span><span class="s2">:</span><span class="si">{lineno:4d}</span><span class="s2"> - </span><span class="si">{reset}{message}</span><span class="s2">&quot;</span>
+
+<span class="n">_MAX_REPETITIONS</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1">#####################</span>
+<span class="c1"># Classes definitions</span>
+<span class="c1">#####################</span>
+
+
+<div class="viewcode-block" id="DatabaseHandler">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.DatabaseHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">DatabaseHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a handler that writes log records to a SQLite database.</span>
+<span class="sd">    The database filename can be specified as an argument or read from the PYTHON_LOG_DATABASE environment variable.</span>
+<span class="sd">    The default filename is the name of the current file with a _log.db suffix and extension.</span>
+<span class="sd">    Registers a function to close the database when the program exits.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_filename: The filename of the SQLite database. Defaults to the value of the PYTHON_LOG_DATABASE environment</span>
+<span class="sd">            variable or the name of the current file with a _log.db suffix and extension.</span>
+<span class="sd">        dont_create: If True, the database file must already exist. Defaults to False.</span>
+<span class="sd">        log_name: The name of the log table in the database. Defaults to the name of the current file.</span>
+<span class="sd">        formatter: The formatter to use for the log records. Defaults to a simple formatter.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        db_filename: The filename of the SQLite database.</span>
+<span class="sd">        log_name: The name of the log table in the database.</span>
+<span class="sd">        conn: The connection to the SQLite database.</span>
+<span class="sd">        cursor: The cursor for the SQLite database.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">        connect_to_database: Connects to the SQLite database.</span>
+<span class="sd">        emit: Inserts a log record into the database.</span>
+<span class="sd">        close: Closes the connection to the SQLite database.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: If the database file does not exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_db_filename</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">_log_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">_dont_create</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dont_create</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">formatter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">db_filename</span><span class="p">)</span>
+
+        <span class="c1"># Set the log name if not specified default to the name of the current file</span>
+        <span class="k">if</span> <span class="n">log_name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_name</span> <span class="o">=</span> <span class="n">log_name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">stem</span>
+
+        <span class="c1"># Set the formatter if specified otherwise use the default formatter</span>
+        <span class="k">if</span> <span class="n">formatter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Default formatter</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">_FORMAT_STR</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;{&quot;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect_to_database</span><span class="p">(</span><span class="n">dont_create</span><span class="o">=</span><span class="n">dont_create</span><span class="p">)</span>
+
+        <span class="c1"># Register a function to close the database when the program exits</span>
+        <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DatabaseHandler.connect_to_database">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.DatabaseHandler.connect_to_database">[docs]</a>
+    <span class="k">def</span> <span class="nf">connect_to_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dont_create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connects to the SQLite database specified in the db_filename property.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dont_create: If True, the database file must already exist. Defaults to False.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            FileNotFoundError: If dont_create is True and the database file does not exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">dont_create</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_filename</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Database file &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">db_filename</span><span class="si">}</span><span class="s2">&#39; does not exist&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Connect to the SQLite database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="c1"># Create a table for logging if it does not exist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            CREATE TABLE IF NOT EXISTS </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">log_name</span><span class="si">}</span><span class="s2"> (</span>
+<span class="s2">                timestamp TEXT,</span>
+<span class="s2">                module TEXT,</span>
+<span class="s2">                funcName TEXT,</span>
+<span class="s2">                lineno INTEGER,</span>
+<span class="s2">                level TEXT,</span>
+<span class="s2">                message TEXT,</span>
+<span class="s2">                exception TEXT,</span>
+<span class="s2">                formatted_message TEXT</span>
+<span class="s2">            )</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DatabaseHandler.emit">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.DatabaseHandler.emit">[docs]</a>
+    <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="c1"># Format the record</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">getMessage</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="p">:</span>
+            <span class="n">formatted_message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">formatted_message</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">getMessage</span><span class="p">()</span>
+
+        <span class="c1"># Extract information from the record</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">created</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">module</span>
+        <span class="n">funcName</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">funcName</span>
+        <span class="n">lineno</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">lineno</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">levelname</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">message</span>
+        <span class="n">exception</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">exc_text</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">exc_text</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># Insert log record into the database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            INSERT INTO </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">log_name</span><span class="si">}</span><span class="s2"> (timestamp, module, funcName, lineno, level, message,</span>
+<span class="s2">                exception, formatted_message)</span>
+<span class="s2">                VALUES (?, ?, ?, ?, ?, ?, ?, ?)</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">funcName</span><span class="p">,</span> <span class="n">lineno</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">exception</span><span class="p">,</span> <span class="n">formatted_message</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DatabaseHandler.close">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.DatabaseHandler.close">[docs]</a>
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Closes the connection to the SQLite database.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">log_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_name</span>
+
+    <span class="nd">@log_name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">log_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">db_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_filename</span>
+
+    <span class="nd">@db_filename</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">db_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the database filename and connects to the database.</span>
+<span class="sd">        If a full path is not specified, the database filename is assumed to be in the log directory.</span>
+<span class="sd">        The log directory is read from the PYTHON_LOG_DIR environment variable or defaults to the</span>
+<span class="sd">            {application root}/logs subdirectory.</span>
+<span class="sd">        The database filename is read from the PYTHON_LOG_DATABASE environment variable or defaults to the</span>
+<span class="sd">            name of the current file with a _log.db suffix and extension.</span>
+<span class="sd">        The PYTHON_APP_ROOT_DIR environment variable can be used to specify the application root directory.</span>
+<span class="sd">        If the path to the database file does not exist, it will be created,</span>
+<span class="sd">            including all the intermediate directories.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            db_filename: The filename of the SQLite database.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            FileNotFoundError: If the database file does not exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">app_dir_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">app_root_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PYTHON_APP_ROOT_DIR&quot;</span><span class="p">,</span> <span class="n">app_dir_name</span><span class="p">)</span>
+        <span class="n">log_root_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PYTHON_LOG_DIR&quot;</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">app_root_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">db_filename</span><span class="p">:</span>
+            <span class="n">db_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PYTHON_LOG_DATABASE&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">log_root_dir</span><span class="si">}</span><span class="s2">_log.db&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">db_filename</span><span class="p">):</span>
+            <span class="n">db_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">log_root_dir</span><span class="p">,</span> <span class="n">db_filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">db_filename</span><span class="p">)):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">db_filename</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_db_filename</span> <span class="o">=</span> <span class="n">db_filename</span></div>
+
+
+
+<div class="viewcode-block" id="SuppressRepeatFilter">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.SuppressRepeatFilter">[docs]</a>
+<span class="k">class</span> <span class="nc">SuppressRepeatFilter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Filter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Suppresses repeated log messages.</span>
+<span class="sd">    If a log message is repeated more than the maximum number of repetitions, the message is suppressed.</span>
+<span class="sd">    Reads the maximum number of repetitions from the PYTHON_LOG_MAX_REPETITIONS environment variable or uses the</span>
+<span class="sd">    default value of 3.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        max_repetitions: The maximum number of repetitions to allow before suppressing the message.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        max_repetitions: The maximum number of repetitions to allow before suppressing the message.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">        filter: Filters log records based on the number of repetitions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_repetitions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_log</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_repeat_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">max_repetitions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">max_repetitions</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PYTHON_LOG_MAX_REPETITIONS&quot;</span><span class="p">,</span> <span class="n">_MAX_REPETITIONS</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_repetitions</span> <span class="o">=</span> <span class="n">max_repetitions</span>
+
+<div class="viewcode-block" id="SuppressRepeatFilter.filter">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.SuppressRepeatFilter.filter">[docs]</a>
+    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="n">current_log</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">msg</span>
+        <span class="k">if</span> <span class="n">current_log</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_log</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_repeat_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># Start suppressing after exceeding maximum repetitions</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repeat_count</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_repetitions</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repeat_count</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_repetitions</span><span class="p">:</span>
+                <span class="n">record</span><span class="o">.</span><span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; [Previous message repeated </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_repeat_count</span><span class="si">}</span><span class="s2"> times]&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_log</span> <span class="o">=</span> <span class="n">current_log</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_repeat_count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_repetitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_repetitions</span>
+
+    <span class="nd">@max_repetitions</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">max_repetitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_repetitions</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">max_repetitions</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Maximum repetitions must be a positive integer&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_repetitions</span> <span class="o">=</span> <span class="n">max_repetitions</span></div>
+
+
+
+<span class="c1">######################</span>
+<span class="c1"># Function definitions</span>
+<span class="c1">######################</span>
+
+
+<div class="viewcode-block" id="setup_logger">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.setup_logger">[docs]</a>
+<span class="k">def</span> <span class="nf">setup_logger</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets up the global logger instance.</span>
+<span class="sd">    Sets the log level and output based on environment variables.</span>
+<span class="sd">    Default log level is INFO.</span>
+<span class="sd">    Default log output is console.</span>
+<span class="sd">    Default log file is the name of the current file with a .log extension.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The global logger instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">logger</span>
+
+    <span class="c1"># Check if logger is already configured</span>
+    <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">logger</span>
+
+    <span class="c1"># Create a logger</span>
+    <span class="n">log_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PYTHON_LOG_NAME&quot;</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">log_name</span><span class="p">)</span>
+
+    <span class="c1"># Read log level from environment variable or use default</span>
+    <span class="n">log_level</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PYTHON_LOG_LEVEL&quot;</span><span class="p">,</span> <span class="s2">&quot;INFO&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">log_level</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">))</span>
+
+    <span class="c1"># Read log output from environment variable</span>
+    <span class="n">log_output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PYTHON_LOG_OUTPUT&quot;</span><span class="p">,</span> <span class="s2">&quot;console&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1"># Set default handler based on the environment variable</span>
+    <span class="c1"># TODO: Add support for filename and path checking and creation if needed</span>
+    <span class="k">if</span> <span class="n">log_output</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
+        <span class="n">log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PYTHON_LOG_FILE&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.log&quot;</span><span class="p">)</span>
+        <span class="n">set_default_handler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">log_file</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">log_output</span> <span class="o">==</span> <span class="s2">&quot;database&quot;</span><span class="p">:</span>
+        <span class="n">db_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PYTHON_LOG_DATABASE&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.db&quot;</span><span class="p">)</span>
+        <span class="n">set_default_handler</span><span class="p">(</span><span class="n">DatabaseHandler</span><span class="p">(</span><span class="n">db_filename</span><span class="o">=</span><span class="n">db_filename</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">set_default_handler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">())</span>
+
+    <span class="c1"># Set the default initial formatter</span>
+    <span class="n">set_log_formatter</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">logger</span></div>
+
+
+
+<div class="viewcode-block" id="set_default_handler">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_default_handler">[docs]</a>
+<span class="k">def</span> <span class="nf">set_default_handler</span><span class="p">(</span><span class="n">handler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets the default handler for the global logger instance.</span>
+<span class="sd">    Uses a color formatter for console output.</span>
+<span class="sd">    Removes all existing handlers and adds the new handler to the logger.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        handler: The handler to set as the default handler.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">logger</span>
+    <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
+        <span class="c1"># Remove all existing handlers</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1"># Add the handler to the logger</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_log_formatter">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_log_formatter">[docs]</a>
+<span class="k">def</span> <span class="nf">set_log_formatter</span><span class="p">(</span><span class="n">format_str</span><span class="o">=</span><span class="n">_FORMAT_COLOR_STR</span><span class="p">,</span> <span class="n">colorize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_colors</span><span class="o">=</span><span class="n">_LOG_COLORS</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets the formatter for the global logger instance.</span>
+<span class="sd">    Supports colorized output for console output and will automatically set the formatter for all existing handlers.</span>
+<span class="sd">    Colorized will be applied only to the handlers that support it. For example, the StreamHandler supports it.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        format_str: The format string to use for the formatter. Defaults to _FORMAT_COLOR_STR.</span>
+<span class="sd">            It uses the new style string formatting with curly braces {} instead of ()%.</span>
+<span class="sd">        colorize: If True, colorize the output. Defaults to True.</span>
+<span class="sd">        log_colors: A dictionary of log colors. Defaults to _LOG_COLORS.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">logger</span>
+    <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">colorize</span><span class="p">:</span>
+            <span class="c1"># Create a formatter with color support</span>
+            <span class="n">formatter</span> <span class="o">=</span> <span class="n">colorlog</span><span class="o">.</span><span class="n">ColoredFormatter</span><span class="p">(</span><span class="n">_FORMAT_COLOR_STR</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="n">log_colors</span><span class="o">=</span><span class="n">log_colors</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Create a simple formatter</span>
+            <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">_FORMAT_STR</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;{&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set the new formatter for all existing handlers that support it. For example, the StreamHandler supports it.</span>
+        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">):</span>
+                <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_log_level">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_log_level">[docs]</a>
+<span class="k">def</span> <span class="nf">set_log_level</span><span class="p">(</span><span class="n">level</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets the log level of the global logger.</span>
+<span class="sd">    Valid levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        level: The log level to set.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the level is not a valid logging level.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">logger</span>
+    <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">level</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_VALID_LOG_LEVELS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&#39; is not a valid logging level. Valid logging levels are </span><span class="si">{</span><span class="n">_VALID_LOG_LEVELS_DICT</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_temporary_level">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_temporary_level">[docs]</a>
+<span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">set_temporary_level</span><span class="p">(</span><span class="n">new_level</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets a temporary log level for the global logger.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        new_level: The log level to set temporarily.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">logger</span>
+    <span class="n">old_level</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">new_level</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">old_level</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_log_level">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.get_log_level">[docs]</a>
+<span class="k">def</span> <span class="nf">get_log_level</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the current log level of the global logger or None if the logger is not set up.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">logger</span>
+    <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="get_log_level_name">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.get_log_level_name">[docs]</a>
+<span class="k">def</span> <span class="nf">get_log_level_name</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the current log level name of the global logger or None if the logger is not set up.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">logger</span>
+    <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<span class="c1"># Alias functions for setting specific log levels</span>
+<div class="viewcode-block" id="set_log_level_debug">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_log_level_debug">[docs]</a>
+<span class="k">def</span> <span class="nf">set_log_level_debug</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the log level to DEBUG.&quot;&quot;&quot;</span>
+    <span class="n">set_log_level</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_log_level_info">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_log_level_info">[docs]</a>
+<span class="k">def</span> <span class="nf">set_log_level_info</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the log level to INFO.&quot;&quot;&quot;</span>
+    <span class="n">set_log_level</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_log_level_warning">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_log_level_warning">[docs]</a>
+<span class="k">def</span> <span class="nf">set_log_level_warning</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the log level to WARNING.&quot;&quot;&quot;</span>
+    <span class="n">set_log_level</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_log_level_error">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_log_level_error">[docs]</a>
+<span class="k">def</span> <span class="nf">set_log_level_error</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the log level to ERROR.&quot;&quot;&quot;</span>
+    <span class="n">set_log_level</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_log_level_critical">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_log_level_critical">[docs]</a>
+<span class="k">def</span> <span class="nf">set_log_level_critical</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the log level to CRITICAL.&quot;&quot;&quot;</span>
+    <span class="n">set_log_level</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># FIXME: Fix it. These functions are not working properly. They are not flushing the output.</span>
+<div class="viewcode-block" id="unbuffered_console_output">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.unbuffered_console_output">[docs]</a>
+<span class="k">def</span> <span class="nf">unbuffered_console_output</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Temporary changes the console output to unbuffered mode.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stream_name: The name of the stream to change. Must be either &#39;stdout&#39; or &#39;stderr&#39;.</span>
+<span class="sd">        Defaults to &#39;stdout&#39;.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the stream name is not &#39;stdout&#39; or &#39;stderr&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Save the original stream</span>
+    <span class="n">original_stream</span> <span class="o">=</span> <span class="n">stream</span>
+    <span class="n">unbuffered_stream</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fdopen</span><span class="p">(</span><span class="n">original_stream</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">buffering</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Replace the original stream with the unbuffered stream</span>
+    <span class="k">if</span> <span class="n">stream</span> <span class="ow">is</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">unbuffered_stream</span>
+    <span class="k">elif</span> <span class="n">stream</span> <span class="ow">is</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">unbuffered_stream</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only sys.stdout and sys.stderr are supported&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Flush and close the unbuffered stream</span>
+        <span class="n">unbuffered_stream</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="c1"># unbuffered_stream.close()</span>
+
+        <span class="c1"># Restore the original stream</span>
+        <span class="k">if</span> <span class="n">stream</span> <span class="ow">is</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">original_stream</span>
+        <span class="k">elif</span> <span class="n">stream</span> <span class="ow">is</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">original_stream</span></div>
+
+
+
+<span class="c1"># FIXME: Fix it. It doesn&#39;t work. It needs to support __enter__ and __exit__ methods, and yield the file object.</span>
+<div class="viewcode-block" id="unbuffered_file_output">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.unbuffered_file_output">[docs]</a>
+<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">unbuffered_file_output</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Temporary changes the file output to unbuffered mode.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path: The path to the file to change.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: If the file does not exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Open the original file with unbuffered writing</span>
+    <span class="n">original_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">buffering</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">original_file</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the file to ensure all data is written</span>
+        <span class="n">original_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="set_output_to_console">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_output_to_console">[docs]</a>
+<span class="k">def</span> <span class="nf">set_output_to_console</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the output of the global logger instance to console.&quot;&quot;&quot;</span>
+    <span class="n">set_default_handler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="set_output_to_file">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_output_to_file">[docs]</a>
+<span class="k">def</span> <span class="nf">set_output_to_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">dont_create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets the output of the global logger instance to a file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path: The path to the log file.</span>
+<span class="sd">        dont_create: If True, the file must already exist. Defaults to False.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: If dont_create is True and the file does not exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dont_create</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&#39; does not exist, and dont_create is True&quot;</span><span class="p">)</span>
+    <span class="n">set_default_handler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="set_output_to_database">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.set_output_to_database">[docs]</a>
+<span class="k">def</span> <span class="nf">set_output_to_database</span><span class="p">(</span><span class="n">db_filename</span><span class="p">,</span> <span class="n">dont_create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets the output of the global logger instance to a database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_filename: The filename of the SQLite database.</span>
+<span class="sd">        dont_create: If True, the database file must already exist. Defaults to False.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: If the database file does not exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">set_default_handler</span><span class="p">(</span><span class="n">DatabaseHandler</span><span class="p">(</span><span class="n">db_filename</span><span class="p">,</span> <span class="n">dont_create</span><span class="o">=</span><span class="n">dont_create</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="add_output_to_console">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.add_output_to_console">[docs]</a>
+<span class="k">def</span> <span class="nf">add_output_to_console</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a console handler to the global logger instance.&quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="add_output_to_file">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.add_output_to_file">[docs]</a>
+<span class="k">def</span> <span class="nf">add_output_to_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">dont_create</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a file handler to the global logger instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path: The path to the log file.</span>
+<span class="sd">        dont_create: If True, the file must already exist. Defaults to False.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: If dont_create is True and the file does not exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dont_create</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&#39; does not exist, and dont_create is True&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="add_output_to_database">
+<a class="viewcode-back" href="../../../../src.pstb.log.html#src.pstb.log.pstb_logger.add_output_to_database">[docs]</a>
+<span class="k">def</span> <span class="nf">add_output_to_database</span><span class="p">(</span><span class="n">db_filename</span><span class="p">,</span> <span class="n">dont_create</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">formatter</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a database handler to the global logger instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        db_filename: The filename of the SQLite database.</span>
+<span class="sd">        dont_create: If True, the database file must already exist. Defaults to False.</span>
+<span class="sd">        log_name: The name of the log table in the database. Defaults to the name of the current file.</span>
+<span class="sd">        formatter: The formatter to use for the log records. Defaults to a simple formatter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">DatabaseHandler</span><span class="p">(</span><span class="n">db_filename</span><span class="p">,</span> <span class="n">dont_create</span><span class="o">=</span><span class="n">dont_create</span><span class="p">,</span> <span class="n">log_name</span><span class="o">=</span><span class="n">log_name</span><span class="p">,</span> <span class="n">formatter</span><span class="o">=</span><span class="n">formatter</span><span class="p">))</span></div>
+
+
+
+<span class="c1"># Set up the logger immediately when the module is imported</span>
+<span class="n">setup_logger</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, gtrevize.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

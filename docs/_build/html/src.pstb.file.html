@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.pstb.file package &mdash; pstb 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pstb
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">src.pstb.file package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-src.pstb.file.pstb_file">src.pstb.file.pstb_file module</a><ul>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict</span></code></a><ul>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict.file_access"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict.file_access</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict.file_created"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict.file_created</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict.file_extension"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict.file_extension</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict.file_group"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict.file_group</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict.file_modified"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict.file_modified</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict.file_name"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict.file_name</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict.file_owner"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict.file_owner</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict.file_path"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict.file_path</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict.file_permissions"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict.file_permissions</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict.file_real_path"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict.file_real_path</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict.file_size"><code class="docutils literal notranslate"><span class="pre">FileDetailsDict.file_size</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.MatchingFilesDict"><code class="docutils literal notranslate"><span class="pre">MatchingFilesDict</span></code></a><ul>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.MatchingFilesDict.access_denied_files"><code class="docutils literal notranslate"><span class="pre">MatchingFilesDict.access_denied_files</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.MatchingFilesDict.actual_depth"><code class="docutils literal notranslate"><span class="pre">MatchingFilesDict.actual_depth</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.MatchingFilesDict.errors_found"><code class="docutils literal notranslate"><span class="pre">MatchingFilesDict.errors_found</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.MatchingFilesDict.excluded_files"><code class="docutils literal notranslate"><span class="pre">MatchingFilesDict.excluded_files</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.MatchingFilesDict.files"><code class="docutils literal notranslate"><span class="pre">MatchingFilesDict.files</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.MatchingFilesDict.max_depth"><code class="docutils literal notranslate"><span class="pre">MatchingFilesDict.max_depth</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.MatchingFilesDict.returned_files"><code class="docutils literal notranslate"><span class="pre">MatchingFilesDict.returned_files</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.MatchingFilesDict.total_files"><code class="docutils literal notranslate"><span class="pre">MatchingFilesDict.total_files</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.check_access"><code class="docutils literal notranslate"><span class="pre">check_access()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.find_root_module"><code class="docutils literal notranslate"><span class="pre">find_root_module()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.format_output"><code class="docutils literal notranslate"><span class="pre">format_output()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.get_file_details"><code class="docutils literal notranslate"><span class="pre">get_file_details()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.get_files"><code class="docutils literal notranslate"><span class="pre">get_files()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.file.pstb_file.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-src.pstb.file">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pstb</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">src.pstb.file package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.pstb.file.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="src-pstb-file-package">
+<h1>src.pstb.file package<a class="headerlink" href="#src-pstb-file-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-src.pstb.file.pstb_file">
+<span id="src-pstb-file-pstb-file-module"></span><h2>src.pstb.file.pstb_file module<a class="headerlink" href="#module-src.pstb.file.pstb_file" title="Link to this heading"></a></h2>
+<p>file_utilities.py - File Utilities Module</p>
+<p>This module provides utility functions for working with files and directories, including file access checks,
+recursive file retrieval, and access control.</p>
+<dl class="simple">
+<dt>Functions:</dt><dd><dl class="simple">
+<dt>check_access(file_path, access_type):</dt><dd><p>Checks if a file has the specified access type.</p>
+</dd>
+<dt>get_files(path, include_pattern=None, exclude_patterns=None, max_depth=0, follow_symlinks=False, access_type=”r”):</dt><dd><p>Recursively retrieves a list of files in a directory based on include/exclude patterns and access type.</p>
+</dd>
+<dt>format_output(result, output_format):</dt><dd><p>Formats the result based on the specified output format.</p>
+</dd>
+<dt>find_root_module(module):</dt><dd><p>Finds the root directory of a given module.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>More information about the functions can be found in their docstrings.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.pstb.file.pstb_file.</span></span><span class="sig-name descname"><span class="pre">FileDetailsDict</span></span><a class="reference internal" href="_modules/src/pstb/file/pstb_file.html#FileDetailsDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Type hint for the dictionary returned by get_file_details.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict.file_access">
+<span class="sig-name descname"><span class="pre">file_access</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict.file_access" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict.file_created">
+<span class="sig-name descname"><span class="pre">file_created</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict.file_created" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict.file_extension">
+<span class="sig-name descname"><span class="pre">file_extension</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict.file_extension" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict.file_group">
+<span class="sig-name descname"><span class="pre">file_group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict.file_group" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict.file_modified">
+<span class="sig-name descname"><span class="pre">file_modified</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict.file_modified" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict.file_name">
+<span class="sig-name descname"><span class="pre">file_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict.file_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict.file_owner">
+<span class="sig-name descname"><span class="pre">file_owner</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict.file_owner" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict.file_path">
+<span class="sig-name descname"><span class="pre">file_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict.file_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict.file_permissions">
+<span class="sig-name descname"><span class="pre">file_permissions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict.file_permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict.file_real_path">
+<span class="sig-name descname"><span class="pre">file_real_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict.file_real_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.FileDetailsDict.file_size">
+<span class="sig-name descname"><span class="pre">file_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.FileDetailsDict.file_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.MatchingFilesDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.pstb.file.pstb_file.</span></span><span class="sig-name descname"><span class="pre">MatchingFilesDict</span></span><a class="reference internal" href="_modules/src/pstb/file/pstb_file.html#MatchingFilesDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.file.pstb_file.MatchingFilesDict" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Type hint for the dictionary returned by get_files.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.MatchingFilesDict.access_denied_files">
+<span class="sig-name descname"><span class="pre">access_denied_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.MatchingFilesDict.access_denied_files" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.MatchingFilesDict.actual_depth">
+<span class="sig-name descname"><span class="pre">actual_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.MatchingFilesDict.actual_depth" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.MatchingFilesDict.errors_found">
+<span class="sig-name descname"><span class="pre">errors_found</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.MatchingFilesDict.errors_found" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.MatchingFilesDict.excluded_files">
+<span class="sig-name descname"><span class="pre">excluded_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.MatchingFilesDict.excluded_files" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.MatchingFilesDict.files">
+<span class="sig-name descname"><span class="pre">files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict" title="src.pstb.file.pstb_file.FileDetailsDict"><span class="pre">FileDetailsDict</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#src.pstb.file.pstb_file.MatchingFilesDict.files" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.MatchingFilesDict.max_depth">
+<span class="sig-name descname"><span class="pre">max_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.MatchingFilesDict.max_depth" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.MatchingFilesDict.returned_files">
+<span class="sig-name descname"><span class="pre">returned_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.MatchingFilesDict.returned_files" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.MatchingFilesDict.total_files">
+<span class="sig-name descname"><span class="pre">total_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.pstb.file.pstb_file.MatchingFilesDict.total_files" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.check_access">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.file.pstb_file.</span></span><span class="sig-name descname"><span class="pre">check_access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/file/pstb_file.html#check_access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.file.pstb_file.check_access" title="Link to this definition"></a></dt>
+<dd><p>Checks if a file has the specified access type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – The path to the file.</p></li>
+<li><p><strong>access_type</strong> (<em>str</em>) – Access type to check. “r” for reading, “w” for writing, “rw” for both.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the file has the specified access type, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">check_access</span><span class="p">(</span><span class="s2">&quot;my_file.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.find_root_module">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.file.pstb_file.</span></span><span class="sig-name descname"><span class="pre">find_root_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/file/pstb_file.html#find_root_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.file.pstb_file.find_root_module" title="Link to this definition"></a></dt>
+<dd><p>Finds the root directory of a given module.</p>
+<p>This function navigates up the directory tree of the provided module’s file path until
+it reaches a directory without an <cite>__init__.py</cite> file, which is typically the root of
+the package. The root directory is then returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>module</strong> (<em>ModuleType</em>) – The module for which to find the root directory. This should
+be a reference to the module, not the module’s name as a string.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The file path representing the root directory of the module’s package.</dt><dd><p>If the module is not part of a package, the directory containing the module file is returned.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">root_path</span> <span class="o">=</span> <span class="n">find_root_module</span><span class="p">(</span><span class="n">my_library</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Root path of the library:&quot;</span><span class="p">,</span> <span class="n">root_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.format_output">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.file.pstb_file.</span></span><span class="sig-name descname"><span class="pre">format_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.pstb.file.pstb_file.MatchingFilesDict" title="src.pstb.file.pstb_file.MatchingFilesDict"><span class="pre">MatchingFilesDict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'plain'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/src/pstb/file/pstb_file.html#format_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.file.pstb_file.format_output" title="Link to this definition"></a></dt>
+<dd><p>Formats the result based on the specified output format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> (<em>dict</em>) – The result to format.</p></li>
+<li><p><strong>output_format</strong> (<em>str</em>) – The output format to use. One of “plain”, “text”, “json”, “csv”, “html”, “json-pretty”.
+text: Tabular output using the tabulate library.
+csv: Only the “files” key is formatted as a string with newline characters separating the file paths.
+pretty-json: JSON output with indentation and colored output, using the colorama library.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the output format is not one of the valid options.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The formatted result.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.get_file_details">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.file.pstb_file.</span></span><span class="sig-name descname"><span class="pre">get_file_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#src.pstb.file.pstb_file.FileDetailsDict" title="src.pstb.file.pstb_file.FileDetailsDict"><span class="pre">FileDetailsDict</span></a></span></span><a class="reference internal" href="_modules/src/pstb/file/pstb_file.html#get_file_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.file.pstb_file.get_file_details" title="Link to this definition"></a></dt>
+<dd><p>Gets details about a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – The path to the file.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>OSError</strong> – If the file doesn’t exist or is inaccessible.</p></li>
+<li><p><strong>FileNotFoundError</strong> – If the file doesn’t exist or is inaccessible.</p></li>
+<li><p><strong>PermissionError</strong> – If access to the file is denied.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>A dictionary containing the following file details:</dt><dd><ul class="simple">
+<li><p>file_path: The full path to the file.</p></li>
+<li><p>file_reaL_path: The full real path to the file, after resolving any symbolic links.</p></li>
+<li><p>file_name: The name of the file.</p></li>
+<li><p>file_extension: The extension of the file.</p></li>
+<li><p>file_size: The size of the file in bytes.</p></li>
+<li><p>file_access: The access type of the file (“r”, “w”, “x”, or a combination of those).</p></li>
+<li><p>file_modified: The date and time the file was last modified.</p></li>
+<li><p>file_created: The date and time the file was created.</p></li>
+<li><p>file_owner: The owner of the file.</p></li>
+<li><p>file_group: The group of the file.</p></li>
+<li><p>file_permissions: The permissions of the file.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.get_files">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.file.pstb_file.</span></span><span class="sig-name descname"><span class="pre">get_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_patterns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">follow_symlinks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'r'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/file/pstb_file.html#get_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.file.pstb_file.get_files" title="Link to this definition"></a></dt>
+<dd><p>Recursively retrieves a list of files in a directory based on include/exclude patterns and access type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – The path to the directory or file to start searching from.</p></li>
+<li><p><strong>include_pattern</strong> (<em>str</em><em>, </em><em>optional</em>) – Pattern to include files (e.g., ‘*.txt’). Default is None (include all).</p></li>
+<li><p><strong>exclude_patterns</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – List of patterns to exclude files (e.g., [’*.jpg’, ‘*.png’]).
+Default is None (no exclusions).</p></li>
+<li><p><strong>max_depth</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum depth of recursion. Default is 0 (infinite).</p></li>
+<li><p><strong>follow_symlinks</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to follow symbolic links. Default is False.</p></li>
+<li><p><strong>access_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Access type to check for each file. “r” for reading, “w” for writing, “rw”
+for both. Default is “r”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the path is invalid.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary containing file information as specified.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.file.pstb_file.main">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.file.pstb_file.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/file/pstb_file.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.file.pstb_file.main" title="Link to this definition"></a></dt>
+<dd><p>Main function for the file_utilities command-line utility.
+This function parses command-line arguments and calls the appropriate functions.
+The valid command-line arguments are as follows:</p>
+<blockquote>
+<div><p>-i, –include-pattern: Pattern to include files (e.g., ‘*.txt’). Default is None (include all).
+-e, –exclude-patterns: List of patterns to exclude files (e.g., ‘*.jpg’). Default is None (no exclusions).
+-d, –max-depth: Maximum depth of recursion. Default is 0 (infinite).
+-s, –follow-symlinks: Whether to follow symbolic links. Default is False.
+-a, –access-type: Access type to check. ‘r’ for reading, ‘w’ for writing, ‘rw’ for both. Default is ‘r’.
+-f, –format: Output format. Default is ‘plain’.
+-o, –output: Output file name. Writes to stdout if not specified.</p>
+</div></blockquote>
+</dd></dl>
+
+</section>
+<section id="module-src.pstb.file">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.pstb.file" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, gtrevize.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

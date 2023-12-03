@@ -5,34 +5,19 @@ This module provides utility functions for working with files and directories, i
 recursive file retrieval, and access control.
 
 Functions:
-- check_access(file_path, access_type):
-    Checks if a file has the specified access type.
+    check_access(file_path, access_type):
+        Checks if a file has the specified access type.
 
-- get_files(path, include_pattern=None, exclude_patterns=None, max_depth=0, follow_symlinks=False, access_type="r"):
-    Recursively retrieves a list of files in a directory based on include/exclude patterns and access type.
+    get_files(path, include_pattern=None, exclude_patterns=None, max_depth=0, follow_symlinks=False, access_type="r"):
+        Recursively retrieves a list of files in a directory based on include/exclude patterns and access type.
 
-    Returns a dictionary with the following format:
-    {
-        "total_files": number,
-        "returned_files": number,
-        "excluded_files": number,
-        "access_denied_files": number,
-        "errors_found": number,
-        "files": [list of files]
-    }
+    format_output(result, output_format):
+        Formats the result based on the specified output format.
 
-    - total_files: Total number of files encountered during the search.
-    - returned_files: Number of files that meet the specified access type and pattern criteria.
-    - excluded_files: Number of files excluded based on patterns.
-    - access_denied_files: Number of files denied access based on permissions.
-    - errors_found: Number of files with errors encountered during the search.
-    - files: List of file paths that meet the specified access type and pattern criteria.
+    find_root_module(module):
+        Finds the root directory of a given module.
 
-- format_output(result, output_format):
-    Formats the result based on the specified output format.
-
-- find_root_module(module):
-    Finds the root directory of a given module.
+More information about the functions can be found in their docstrings.
 """
 
 
@@ -132,8 +117,8 @@ def get_files(
 
     Args:
         path (str): The path to the directory or file to start searching from.
-        include_pattern (str, optional): Pattern to include files (e.g., '*.txt'). Default is None (include all).
-        exclude_patterns (list of str, optional): List of patterns to exclude files (e.g., ['*.jpg', '*.png']).
+        include_pattern (str, optional): Pattern to include files (e.g., '\\*.txt'). Default is None (include all).
+        exclude_patterns (list of str, optional): List of patterns to exclude files (e.g., ['\\*.jpg', '\\*.png']).
             Default is None (no exclusions).
         max_depth (int, optional): Maximum depth of recursion. Default is 0 (infinite).
         follow_symlinks (bool, optional): Whether to follow symbolic links. Default is False.
@@ -355,13 +340,12 @@ def main():
     Main function for the file_utilities command-line utility.
     This function parses command-line arguments and calls the appropriate functions.
     The valid command-line arguments are as follows:
-        -i, --include-pattern: Pattern to include files (e.g., '*.txt'). Default is None (include all).
-        -e, --exclude-patterns: List of patterns to exclude files (e.g., '*.jpg' '*.png').
-            Default is None (no exclusions).
+
+        -i, --include-pattern: Pattern to include files (e.g., '\\*.txt'). Default is None (include all).
+        -e, --exclude-patterns: List of patterns to exclude files (e.g., '\\*.jpg'). Default is None (no exclusions).
         -d, --max-depth: Maximum depth of recursion. Default is 0 (infinite).
         -s, --follow-symlinks: Whether to follow symbolic links. Default is False.
-        -a, --access-type: Access type to check for each file. 'r' for reading, 'w' for writing, 'rw' for both.
-            Default is 'r'.
+        -a, --access-type: Access type to check. 'r' for reading, 'w' for writing, 'rw' for both. Default is 'r'.
         -f, --format: Output format. Default is 'plain'.
         -o, --output: Output file name. Writes to stdout if not specified.
     """
@@ -371,13 +355,13 @@ def main():
     parser.add_argument(
         "-i",
         "--include-pattern",
-        help="Pattern to include files (e.g., '*.txt'). Default is None (include all).",
+        help="Pattern to include files (e.g., '\\*.txt'). Default is None (include all).",
     )
     parser.add_argument(
         "-e",
         "--exclude-patterns",
         nargs="+",
-        help="List of patterns to exclude files (e.g., '*.jpg' '*.png'). Default is None (no exclusions).",
+        help="List of patterns to exclude files (e.g., '\\*.jpg'). Default is None (no exclusions).",
     )
     parser.add_argument(
         "-d",
