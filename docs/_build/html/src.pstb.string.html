@@ -50,6 +50,7 @@
 <li><a class="reference internal" href="#src.pstb.string.pstb_string.dict_to_csv_str"><code class="docutils literal notranslate"><span class="pre">dict_to_csv_str()</span></code></a></li>
 <li><a class="reference internal" href="#src.pstb.string.pstb_string.dict_to_html_str"><code class="docutils literal notranslate"><span class="pre">dict_to_html_str()</span></code></a></li>
 <li><a class="reference internal" href="#src.pstb.string.pstb_string.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a class="reference internal" href="#src.pstb.string.pstb_string.text_to_list"><code class="docutils literal notranslate"><span class="pre">text_to_list()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-src.pstb.string">Module contents</a></li>
@@ -89,9 +90,11 @@
 <section id="module-src.pstb.string.pstb_string">
 <span id="src-pstb-string-pstb-string-module"></span><h2>src.pstb.string.pstb_string module<a class="headerlink" href="#module-src.pstb.string.pstb_string" title="Link to this heading"></a></h2>
 <p>String utilities.</p>
-<dl class="simple">
-<dt>Functions:</dt><dd><p>dict_to_csv_str: Convert a dictionary to a CSV string.
-dict_to_html_str: Convert a dictionary to an HTML string.</p>
+<dl>
+<dt>Functions:</dt><dd><p>dict_to_csv_str(data: list[dict], field_names: list | None = None, column_headers: bool = True,
+quoting: int = csv.QUOTE_MINIMAL, quote_char: str = ‘”’, delimiter: str = “,”,) -&gt; str</p>
+<p>dict_to_html_str(data: dict | list, indent: int = 2) -&gt; str</p>
+<p>text_to_list(text: str) -&gt; list[float] -&gt; list[int]</p>
 </dd>
 </dl>
 <dl class="py function">
@@ -152,6 +155,77 @@ This function is recursive, so it can handle nested dictionaries and lists.</p>
 <dt class="sig sig-object py" id="src.pstb.string.pstb_string.main">
 <span class="sig-prename descclassname"><span class="pre">src.pstb.string.pstb_string.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/string/pstb_string.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.string.pstb_string.main" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.pstb.string.pstb_string.text_to_list">
+<span class="sig-prename descclassname"><span class="pre">src.pstb.string.pstb_string.</span></span><span class="sig-name descname"><span class="pre">text_to_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/pstb/string/pstb_string.html#text_to_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.pstb.string.pstb_string.text_to_list" title="Link to this definition"></a></dt>
+<dd><p>Convert a string to a list of numbers.
+Supports range notation, comparison operators, and modifiers and exclusions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>) – Input string denoting a number range.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of numbers.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If range notation is mixed with comparison operators.</p></li>
+<li><p><strong>ValueError</strong> – If invalid range notation is used.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The valid syntax for range notation is:</p>
+<p>“1-10” -&gt; Range from 1 to 10, inclusive.</p>
+<p>“~5-10” -&gt; Exclude range from 5 to 10, inclusive.</p>
+<p>“1-10, ~5-8” -&gt; Range from 1 to 10, excluding range from 5 to 8.</p>
+<p>“1-10, ~5-8, &gt;=7” -&gt; Range from 1 to 10, excluding range from 5 to 8, and including numbers
+greater than or equal to 7.</p>
+<p>“1-10, ~5-8, &gt;=7:odd” -&gt; Range from 1 to 10, excluding range from 5 to 8, including numbers greater than or
+equal to 7, and only odd numbers.</p>
+<p>“1-10, ~5-8, &gt;=7:odd,step=2” -&gt; Range from 1 to 10, excluding range from 5 to 8, including numbers greater than
+or equal to 7, only odd numbers, and step of 2.</p>
+<p>“1-10, ~5-8, &gt;=7:odd,step=2,div=3” -&gt; Range from 1 to 10, excluding range from 5 to 8, including numbers
+greater than or equal to 7, only odd numbers, step of 2, and divisible by 3.</p>
+<p>“1-10, ~5-8, ~3” -&gt; Range from 1 to 10, excluding range from 5 to 8, and excluding 3.</p>
+<p>“1-10, ~5-8, ~3-6” -&gt; Range from 1 to 10, excluding range from 5 to 8, excluding range from 3 to 6.</p>
+<p>The valid modifiers are:</p>
+<ul class="simple">
+<li><p>“odd” -&gt; Only odd numbers.</p></li>
+<li><p>“even” -&gt; Only even numbers.</p></li>
+<li><p>“step=2” -&gt; Step of 2.</p></li>
+<li><p>“div=3” -&gt; Divisible by 3.</p></li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<ul class="simple">
+<li><p>Comparison operators (&lt;, &lt;=, &gt;, &gt;=) can be used in combination with the exclusion operator (~)
+in the same string.</p></li>
+<li><p>However, when using comparison operators with the exclusion operator, it is important to ensure that the
+range notation (‘-’) is not mixed with the comparison operators.</p></li>
+<li><p>If range notation is mixed with comparison operators without the exclusion operator,
+a ValueError will be raised.</p></li>
+</ul>
+</div>
+<p class="rubric">Examples</p>
+<p>“1-10” -&gt; [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</p>
+<p>“1-10, 20-30” -&gt; [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, …, 30]</p>
+<p>“1-10, ~5-8” -&gt; [1, 2, 3, 4, 9, 10]</p>
+<p>“1-10, ~5-8, &gt;=7” -&gt; [1, 2, 3, 4, 9, 10, 7, 8]</p>
+<p>“1-10, ~5-8, &gt;=7:odd” -&gt; [1, 3, 9, 7]</p>
+<p>“1-10, ~5-8, &gt;=7:odd,step=2” -&gt; [1, 9]</p>
+<p>“1-10, ~5-8, &gt;=7:odd,step=2,div=3” -&gt; [9]</p>
+<p>“1-10, ~5-8, ~3” -&gt; [1, 2, 4, 5, 6, 7, 8, 9, 10]</p>
+<p>“1-10, ~5-8, ~3-6” -&gt; [1, 2, 4, 5, 9, 10]</p>
+<p>“1-10, ~5-8, &lt;3, &gt;7” -&gt; [1, 2, 8, 9, 10]</p>
+<p>“1-10, ~5-8, &lt;3, &gt;7:even” -&gt; [2, 8, 10]</p>
+</dd></dl>
 
 </section>
 <section id="module-src.pstb.string">

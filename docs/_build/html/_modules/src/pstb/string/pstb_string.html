@@ -72,13 +72,21 @@
 <span class="sd">String utilities.</span>
 
 <span class="sd">Functions:</span>
-<span class="sd">    dict_to_csv_str: Convert a dictionary to a CSV string.</span>
-<span class="sd">    dict_to_html_str: Convert a dictionary to an HTML string.</span>
+<span class="sd">    dict_to_csv_str(data: list[dict], field_names: list | None = None, column_headers: bool = True,</span>
+<span class="sd">    quoting: int = csv.QUOTE_MINIMAL, quote_char: str = &#39;&quot;&#39;, delimiter: str = &quot;,&quot;,) -&gt; str</span>
+
+<span class="sd">    dict_to_html_str(data: dict | list, indent: int = 2) -&gt; str</span>
+
+<span class="sd">    text_to_list(text: str) -&gt; list[float] -&gt; list[int]</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">csv</span>
 <span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="c1"># cspell: disable-next-line</span>
+<span class="kn">from</span> <span class="nn">sympy.ntheory</span> <span class="kn">import</span> <span class="n">isprime</span>
 
 
 <div class="viewcode-block" id="dict_to_csv_str">
@@ -197,6 +205,162 @@
 
     <span class="k">return</span> <span class="n">html</span></div>
 
+
+
+<div class="viewcode-block" id="text_to_list">
+<a class="viewcode-back" href="../../../../src.pstb.string.html#src.pstb.string.pstb_string.text_to_list">[docs]</a>
+<span class="k">def</span> <span class="nf">text_to_list</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a string to a list of numbers.</span>
+<span class="sd">    Supports range notation, comparison operators, and modifiers and exclusions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        text (str): Input string denoting a number range.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: List of numbers.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If range notation is mixed with comparison operators.</span>
+<span class="sd">        ValueError: If invalid range notation is used.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The valid syntax for range notation is:</span>
+
+<span class="sd">        &quot;1-10&quot; -&gt; Range from 1 to 10, inclusive.</span>
+
+<span class="sd">        &quot;~5-10&quot; -&gt; Exclude range from 5 to 10, inclusive.</span>
+
+<span class="sd">        &quot;1-10, ~5-8&quot; -&gt; Range from 1 to 10, excluding range from 5 to 8.</span>
+
+<span class="sd">        &quot;1-10, ~5-8, &gt;=7&quot; -&gt; Range from 1 to 10, excluding range from 5 to 8, and including numbers</span>
+<span class="sd">        greater than or equal to 7.</span>
+
+<span class="sd">        &quot;1-10, ~5-8, &gt;=7:odd&quot; -&gt; Range from 1 to 10, excluding range from 5 to 8, including numbers greater than or</span>
+<span class="sd">        equal to 7, and only odd numbers.</span>
+
+<span class="sd">        &quot;1-10, ~5-8, &gt;=7:odd,step=2&quot; -&gt; Range from 1 to 10, excluding range from 5 to 8, including numbers greater than</span>
+<span class="sd">        or equal to 7, only odd numbers, and step of 2.</span>
+
+<span class="sd">        &quot;1-10, ~5-8, &gt;=7:odd,step=2,div=3&quot; -&gt; Range from 1 to 10, excluding range from 5 to 8, including numbers</span>
+<span class="sd">        greater than or equal to 7, only odd numbers, step of 2, and divisible by 3.</span>
+
+<span class="sd">        &quot;1-10, ~5-8, ~3&quot; -&gt; Range from 1 to 10, excluding range from 5 to 8, and excluding 3.</span>
+
+<span class="sd">        &quot;1-10, ~5-8, ~3-6&quot; -&gt; Range from 1 to 10, excluding range from 5 to 8, excluding range from 3 to 6.</span>
+
+<span class="sd">        The valid modifiers are:</span>
+
+<span class="sd">        - &quot;odd&quot; -&gt; Only odd numbers.</span>
+<span class="sd">        - &quot;even&quot; -&gt; Only even numbers.</span>
+<span class="sd">        - &quot;step=2&quot; -&gt; Step of 2.</span>
+<span class="sd">        - &quot;div=3&quot; -&gt; Divisible by 3.</span>
+
+<span class="sd">    Warning:</span>
+<span class="sd">        - Comparison operators (&lt;, &lt;=, &gt;, &gt;=) can be used in combination with the exclusion operator (~)</span>
+<span class="sd">          in the same string.</span>
+<span class="sd">        - However, when using comparison operators with the exclusion operator, it is important to ensure that the</span>
+<span class="sd">          range notation (&#39;-&#39;) is not mixed with the comparison operators.</span>
+<span class="sd">        - If range notation is mixed with comparison operators without the exclusion operator,</span>
+<span class="sd">          a ValueError will be raised.</span>
+
+
+<span class="sd">    Examples:</span>
+<span class="sd">            &quot;1-10&quot; -&gt; [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
+
+<span class="sd">            &quot;1-10, 20-30&quot; -&gt; [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, ..., 30]</span>
+
+<span class="sd">            &quot;1-10, ~5-8&quot; -&gt; [1, 2, 3, 4, 9, 10]</span>
+
+<span class="sd">            &quot;1-10, ~5-8, &gt;=7&quot; -&gt; [1, 2, 3, 4, 9, 10, 7, 8]</span>
+
+<span class="sd">            &quot;1-10, ~5-8, &gt;=7:odd&quot; -&gt; [1, 3, 9, 7]</span>
+
+<span class="sd">            &quot;1-10, ~5-8, &gt;=7:odd,step=2&quot; -&gt; [1, 9]</span>
+
+<span class="sd">            &quot;1-10, ~5-8, &gt;=7:odd,step=2,div=3&quot; -&gt; [9]</span>
+
+<span class="sd">            &quot;1-10, ~5-8, ~3&quot; -&gt; [1, 2, 4, 5, 6, 7, 8, 9, 10]</span>
+
+<span class="sd">            &quot;1-10, ~5-8, ~3-6&quot; -&gt; [1, 2, 4, 5, 9, 10]</span>
+
+<span class="sd">            &quot;1-10, ~5-8, &lt;3, &gt;7&quot; -&gt; [1, 2, 8, 9, 10]</span>
+
+<span class="sd">            &quot;1-10, ~5-8, &lt;3, &gt;7:even&quot; -&gt; [2, 8, 10]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Separate the range string and the modifiers</span>
+    <span class="k">if</span> <span class="s2">&quot;:&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+        <span class="n">range_string</span><span class="p">,</span> <span class="n">modifier_string</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">range_string</span><span class="p">,</span> <span class="n">modifier_string</span> <span class="o">=</span> <span class="n">text</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Find all patterns in the range string</span>
+    <span class="n">patterns</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\d+)-(\d+)|(\d+)|([&lt;&gt;]=?\d+)|(~\d+-\d+)|(~\d+)&quot;</span><span class="p">,</span> <span class="n">range_string</span><span class="p">)</span>
+
+    <span class="c1"># Validation for mixing range notation with comparison operators</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="nb">any</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="ow">in</span> <span class="n">part</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">range_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+        <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">op</span> <span class="ow">in</span> <span class="n">range_string</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;&lt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;=&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;=&quot;</span><span class="p">])</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="s2">&quot;~&quot;</span> <span class="ow">in</span> <span class="n">part</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">range_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Range notation &#39;-&#39; cannot be combined with comparison operators &#39;&lt;&#39;, &#39;&lt;=&#39;, &#39;&gt;&#39;, &#39;&gt;=&#39; unless it&#39;s part of</span>
+<span class="sd">            an exclusion range &#39;~&#39;&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># Using a set to avoid duplicates</span>
+
+    <span class="c1"># Process the range patterns</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">patterns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># Range like &quot;1-10&quot;</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>  <span class="c1"># Single number like &quot;12&quot;</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">elif</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>  <span class="c1"># Conditions like &quot;&lt;=100&quot; or &quot;&gt;=10&quot;</span>
+            <span class="c1"># Extract the comparison operator and number</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([&lt;&gt;]=?)(\d+)&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">comp_op</span><span class="p">,</span> <span class="n">number</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+                <span class="n">number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+
+                <span class="c1"># Generate range based on the comparison operator</span>
+                <span class="k">if</span> <span class="n">comp_op</span> <span class="o">==</span> <span class="s2">&quot;&lt;=&quot;</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">comp_op</span> <span class="o">==</span> <span class="s2">&quot;&gt;=&quot;</span><span class="p">:</span>
+                    <span class="c1"># Assuming a large number for the upper limit</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="mi">10000</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span>  <span class="c1"># Exclude subrange like &quot;~10-20&quot;</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span>  <span class="c1"># Exclude single number like &quot;~13&quot;</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">][</span><span class="mi">1</span><span class="p">:]))</span>
+
+    <span class="c1"># Process the modifiers</span>
+    <span class="n">modifiers</span> <span class="o">=</span> <span class="n">modifier_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">modifiers</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mod</span> <span class="o">==</span> <span class="s2">&quot;odd&quot;</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">if</span> <span class="n">x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">mod</span> <span class="o">==</span> <span class="s2">&quot;even&quot;</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">if</span> <span class="n">x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">mod</span> <span class="o">==</span> <span class="s2">&quot;prime&quot;</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">if</span> <span class="n">isprime</span><span class="p">(</span><span class="n">x</span><span class="p">)}</span>
+        <span class="k">elif</span> <span class="n">mod</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;step&quot;</span><span class="p">):</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d+&quot;</span><span class="p">,</span> <span class="n">mod</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d+&quot;</span><span class="p">,</span> <span class="n">mod</span><span class="p">)</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">))</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">mod</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">):</span>
+            <span class="n">divisor</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d+&quot;</span><span class="p">,</span> <span class="n">mod</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\d+&quot;</span><span class="p">,</span> <span class="n">mod</span><span class="p">)</span> <span class="k">else</span> <span class="mi">7</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">if</span> <span class="n">x</span> <span class="o">%</span> <span class="n">divisor</span> <span class="o">==</span> <span class="mi">0</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Example usage</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">text_to_list</span><span class="p">(</span><span class="s2">&quot;1-100, ~10-20, &gt;=30:even,step=2&quot;</span><span class="p">))</span>  <span class="c1"># Apply even, step modifiers and exclude range 10-20</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
 <span class="c1"># Sample data: List of dictionaries</span>

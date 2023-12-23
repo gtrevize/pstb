@@ -679,7 +679,7 @@ def main():
     -a, --api-key: The API key to use for the request. If None, the value of the _RANDOM_ORG_API_KEY environment
     -c, --count: Number of random strings to generate (default: 1)
     -C, --choice: Make a choice from a given set of choices. It can be a list or a dictionary. Optional arguments:
-        number of choices to make (default: 1), unique (default: False)
+    number of choices to make (default: 1), unique (default: False)
     -f, --fail-on-error: Fail on error when making API requests
     -h, --help: Show this help message and exit
     -i, --integers: Generate random integers

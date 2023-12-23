@@ -94,7 +94,7 @@ class DatabaseHandler(logging.Handler):
     _log_name: str
     _dont_create: bool = False
 
-    def __init__(self, db_filename: str | None = None, dont_create=False, log_name: str | None = None, formatter=None):
+    def __init__(self, db_filename: str | None = None, dont_create=False, log_name: str = "", formatter=None):
         super().__init__()
         self.db_filename = str(db_filename)
 
@@ -102,7 +102,7 @@ class DatabaseHandler(logging.Handler):
         if log_name:
             self._log_name = log_name
         else:
-            self._log_name = Path(sys.argv[0]).resolve().stem
+            self._log_name = Path(__file__).resolve().stem
 
         # Set the formatter if specified otherwise use the default formatter
         if formatter is not None:
