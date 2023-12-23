@@ -10,26 +10,36 @@ Note:
     Here is an archived URL of a good discussion on the topic: https://perma.cc/CZK7-EVR4
 
 Functions:
-    get_true_random_bytes(count, timeout=10, fail_on_error=False)
+    check_random_org_quota(count: int, timeout: int = 10, api_key: str = _RANDOM_ORG_API_KEY,
+    fail_on_error: bool = False) -> None
 
-    get_true_random_integers(count, min, max, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False,
-    unique=False)
+    get_random_org_quota(count: int, timeout: int = 10, api_key: str = _RANDOM_ORG_API_KEY,
+    fail_on_error: bool = False) -> None
 
-    generate_random_integers(count, min_value, max_value, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False,
-    
-    generate_random_string(length, valid_characters=_ALPHANUMERIC_CHARACTERS, unique=False)
-    
-    check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False)
+    get_true_random_bytes(count: int, timeout: int = 10, fail_on_error: bool = False) -> bytes
 
-    true_random_choice(choices_set, count=1, unique=False, timeout=10, api_key=_RANDOM_ORG_API_KEY)
+    get_true_random_integers(count: int, min: int, max: int, timeout: int = 10, api_key: str = _RANDOM_ORG_API_KEY,
+    fail_on_error: bool = False, unique: bool = False) -> List[int]
+
+    generate_random_integers(count: int, min_value: int, max_value: int, timeout: int = 10,
+    api_key: str = _RANDOM_ORG_API_KEY, fail_on_error: bool = False) -> List[int]
+
+    generate_random_string(length: int, valid_characters: str = _ALPHANUMERIC_CHARACTERS, unique: bool = False) -> str
+
+    check_random_org_quota(count: int, timeout: int = 10, api_key: str = _RANDOM_ORG_API_KEY,
+    fail_on_error: bool = False) -> None
+
+    true_random_choice(choices_set: Set[Any], count: int = 1, unique: bool = False, timeout: int = 10,
+    api_key: str = _RANDOM_ORG_API_KEY) -> Union[Any, List[Any]]
 """
 
 import argparse
+import json
 import os
 import secrets
 import string
+import sys
 import time
-from itertools import count
 from typing import Any, Generator
 
 import requests
@@ -73,6 +83,39 @@ class RandomOrgQuotaPayload(TypedDict):
     method: Literal["getUsage"]
     params: QuotaPayloadParams
     id: int
+
+
+############
+# Exceptions
+############
+
+
+class RandomQuotaExceeded(Exception):
+    """
+    Exception raised when the quota is exceeded
+    """
+
+    def __init__(self, message: str = "Quota exceeded", requested_bits: int = 0, remaining_bits: int = -1) -> None:
+        """
+        Constructor for the RandomQuotaExceeded exception
+
+        Args:
+            message (str, optional): The error message. Default is "Quota exceeded".
+            requested_bits (int, optional): The number of bits requested. Default is 0.
+            remaining_bits (int, optional): The number of remaining bits. Default is 0.
+        """
+
+        self.requested_bytes = int(requested_bits / 8)  # Convert to bytes
+        self.remaining_bytes = int(remaining_bits / 8)  # Convert to bytes
+
+        if self.requested_bytes > 0:
+            message += f" trying to generate {self.requested_bytes} bytes"
+
+        if self.remaining_bytes != -1:
+            message += f" with only {self.remaining_bytes} bytes remaining"
+
+        self.message = message
+        super().__init__(self.message)
 
 
 ############################
@@ -182,7 +225,7 @@ def get_true_random_integers(
     api_key: str = _RANDOM_ORG_API_KEY,
     fail_on_error: bool = False,
     unique: bool = False,
-):
+) -> list[int] | None:
     """
     Fetches true random integers from random.org.
     Requires an API key, if none is provided, falls back to generating integers from random.org bytes.
@@ -229,6 +272,7 @@ def get_true_random_integers(
         else:
             return None
 
+    generated_numbers: set[int] = set()
     try:
         # Check quota before requesting true random numbers
         if check_random_org_quota(count, timeout=timeout, api_key=api_key, fail_on_error=fail_on_error):
@@ -257,70 +301,105 @@ def get_true_random_integers(
                         # If quota is not sufficient raise Exception or fallback to pseudo-random numbers
                         if fail_on_error:
                             raise requests.exceptions.RequestException("Warning not enough quota in random.org")
+                        else:
+                            return None
                 else:
                     # If error on request raise Exception or fallback to pseudo-random numbers
                     if fail_on_error:
                         raise requests.exceptions.RequestException(
                             f"Request to random.org failed with status code {response.status_code}"
                         )
+                    else:
+                        return None
             else:
                 # There's enough quota, fetch true random numbers without an API key
                 random_org_url = _RANDOM_ORG_URL.format(count=count)
-                response = requests.get(random_org_url, timeout=timeout)
-                if response.status_code == 200:
-                    return [int(byte) % (max - min + 1) + min for byte in bytes.fromhex(response.text)]
-                else:
-                    # If error on request raise Exception or fallback to pseudo-random numbers
-                    if fail_on_error:
-                        raise requests.exceptions.RequestException(
-                            f"Request to random.org failed with status code {response.status_code}"
-                        )
-        else:
-            # If quota is not sufficient raise Exception or fallback to pseudo-random numbers
-            if fail_on_error:
-                raise requests.exceptions.RequestException(f"Quota exceeded trying to generate {count} integers.")
+                start_time = time.perf_counter()
+                while len(generated_numbers) < count:
+                    elapsed_time = (time.perf_counter() - start_time) * 1000  # Convert to milliseconds
+                    if timeout is not None and elapsed_time > (timeout * 1000):  # Convert timeout to milliseconds
+                        if fail_on_error:
+                            raise ValueError(
+                                f"""
+                                Timeout: {timeout} secs; generating {count} unique random integers
+                                within the range {min}-{max}
+                                """
+                            )
+                        else:
+                            return None
+
+                    response = requests.get(random_org_url, timeout=timeout)
+                    if response.status_code == 200:
+                        if unique:
+                            generated_numbers.update(
+                                [int(byte) % (max - min + 1) + min for byte in bytes.fromhex(response.text)]
+                            )
+                        else:
+                            return [int(byte) % (max - min + 1) + min for byte in bytes.fromhex(response.text)]
+                    else:
+                        # If error on request raise Exception or fallback to pseudo-random numbers
+                        if fail_on_error:
+                            raise requests.exceptions.RequestException(
+                                f"Request to random.org failed with status code {response.status_code}"
+                            )
+                        else:
+                            return None
+
+                return list(generated_numbers)
 
     except requests.exceptions.Timeout:
         if fail_on_error:
-            raise requests.exceptions.RequestException(f"Request to random.org timed out after {timeout} seconds")
+            raise requests.exceptions.Timeout(f"Request to random.org timed out after {timeout} seconds")
+        else:
+            return None
 
     except requests.exceptions.RequestException as e:
         # Handle timeout or other request errors raise Exception or fallback to pseudo-random numbers
         if fail_on_error:
             raise requests.exceptions.RequestException(f"Request to random.org failed with exception {e}")
+        else:
+            return None
 
     # Fallback to pseudo-random numbers using secrets module
     if not unique:
         return [min + secrets.randbelow(max - min + 1) for _ in range(count)]
     else:
         start_time = time.perf_counter()
-        generated_numbers: set[int] = set()
         while len(generated_numbers) < count:
             elapsed_time = (time.perf_counter() - start_time) * 1000  # Convert to milliseconds
             if timeout is not None and elapsed_time > (timeout * 1000):  # Convert timeout to milliseconds
-                raise ValueError(
-                    f"Timeout: {timeout} secs; generating {count} unique random integers within the range {min}-{max}"
-                )
+                if fail_on_error:
+                    raise ValueError(
+                        f"""
+                        Timeout: {timeout} secs; generating {count} unique
+                        random integers within the range {min}-{max}
+                        """
+                    )
+                else:
+                    return None
             if unique:
                 generated_numbers.add(min + secrets.randbelow(max - min + 1))
             else:
                 return [min + secrets.randbelow(max - min + 1) for _ in range(count)]
 
+        return list(generated_numbers)
+
 
 def true_random_choice(
-    choices_set: list | dict,
+    choices: list | dict,
     count: int = 1,
     unique: bool = False,
     timeout: int = 10,
     api_key: str = _RANDOM_ORG_API_KEY,
-) -> Any | Generator[Any, None, None] | None:
+    fail_on_error: bool = False,
+) -> Generator[Any, None, None]:
     """
     Makes a choice from a given set of choices.
     It uses true random numbers from random.org or falls back to pseudo-random numbers using urandom.
     If count is greater than 1, it yields the choices.
 
     Args:
-        choices_set (list | dict): The set of choices to choose from. It can be a list or a dictionary.
+        choices (list | dict): The set of choices to choose from. It can be a list or a dictionary.
         count (int, optional): The number of integers to fetch. Default is 1.
         unique (bool, optional): If True, the fetched integers will be unique within this call. Default is False.
         timeout (int, optional): The timeout for the function to complete. Default is 10 seconds.
@@ -333,9 +412,10 @@ def true_random_choice(
 
         api_key (str, optional): The API key to use for the request. If None, the value of the **_RANDOM_ORG_API_KEY**
             environment variable will be used. Default is None.
+        fail_on_error (bool, optional): If True, raise an exception if the request to random.org fails.
 
     Note:
-        If a dictionary is passed as choices_set, the choice will be made from the values of the dictionary.
+        If a dictionary is passed as choices, the choice will be made from the values of the dictionary.
         It is not possible to make a choice from the keys of the dictionary.
         Also it is assumed that the values of the dictionary are primitive types (int, str, etc.). If the values
         are complex types a TypeError exception will be raised.
@@ -343,16 +423,14 @@ def true_random_choice(
     Yields:
         Any: A random element of the given choices set. If unique is True the yielded elements will be unique.
 
-    Returns:
-        Any: A random element of the given choices set.
-
         None: If count is greater than 1 and fail_on_error is False and it is not possible to generate unique
         random integers given the range.
 
     Raises:
-        TypeError: If choices_set is not a list or a dictionary.
+        TypeError: If choices is not a list or a dictionary.
         TypeError: If the values of the dictionary are not primitive types (int, float, str, bool, NoneType).
         ValueError: If count is less than 1.
+        ValueError: If choices is empty.
 
     See Also:
         :func:`get_true_random_integers` function for more information on how the random integers are generated
@@ -373,38 +451,42 @@ def true_random_choice(
 
     """
     # Check arguments sanity
-    if isinstance(choices_set, dict):
-        choices_set = list(choices_set.values())
+    if isinstance(choices, dict):
+        choices = list(choices.values())
         # check if the values of the dictionary are primitive types
-        if not all(isinstance(choice, (int, float, str, bool, type(None))) for choice in choices_set):
+        if not all(isinstance(choice, (int, float, str, bool, type(None))) for choice in choices):
             raise TypeError("The values of the dictionary must be primitive types (int, float, str, bool, NoneType)")
-    elif isinstance(choices_set, list):
+    elif isinstance(choices, list):
         pass
     else:
-        raise TypeError("choices_set must be a list or a dictionary")
+        raise TypeError("choices must be a list or a dictionary")
+
+    # choices can't be empty
+    if not choices:
+        raise ValueError("choices can't be empty")
 
     if count < 1:
         raise ValueError("count must be greater than 0")
 
     # Get the random integers
     random_integers = get_true_random_integers(
-        count, 1, len(choices_set), timeout=timeout, api_key=api_key, unique=unique
+        count, 1, len(choices), timeout=timeout, api_key=api_key, unique=unique, fail_on_error=fail_on_error
     )
     if not random_integers:
-        return None
-
-    # Return or yield the choices
-    if count == 1:
-        return choices_set[random_integers[0]]
+        yield None
     else:
-        choices = [choices_set[i - 1] for i in random_integers]
-        yield from choices
-
-    return None  # This is needed to avoid a warning from mypy
+        # yield the choices
+        selected_choices = [choices[i - 1] for i in random_integers]
+        yield from selected_choices
 
 
 def get_true_random_string(
-    length, valid_characters: list[str] | str = _ALPHANUMERIC_CHARACTERS, unique: bool = False, timeout: int = 10
+    length,
+    valid_characters: list[str] | str = _ALPHANUMERIC_CHARACTERS,
+    unique: bool = False,
+    timeout: int = 10,
+    api_key: str = _RANDOM_ORG_API_KEY,
+    fail_on_error: bool = False,
 ) -> str | None:
     """
     Generates a random string of alphanumeric characters.
@@ -415,6 +497,8 @@ def get_true_random_string(
             default is _ALPHANUMERIC_CHARACTERS which is equal to `string.ascii_letters + string.digits`.
         unique (bool, optional): If True, the generated string will be unique within this call. Default is False.
         timeout (int, optional): The timeout for the function to complete. Default is 10 seconds.
+        api_key (str, optional): The API key to use for the request. If None, the value of the _RANDOM_ORG_API_KEY.
+        fail_on_error (bool, optional): If True, raise an exception if the request to random.org fails.
 
     Returns:
         str: The generated random string.
@@ -467,20 +551,20 @@ def get_true_random_string(
         raise TypeError("valid_characters must be a list or a string")
 
     # Return the result
-    if count == 1:
-        return str(true_random_choice(valid_characters))
-    else:
-        character_generator = true_random_choice(valid_characters, count=length, unique=unique, timeout=timeout)
-        if not character_generator:
-            return None
+    character_generator = true_random_choice(
+        valid_characters, count=length, unique=unique, timeout=timeout, api_key=api_key, fail_on_error=fail_on_error
+    )
+    if not character_generator:
+        return None
 
-        result = ""
-        for character in character_generator:
-            result += character
-        return result
+    result = ""
+    for character in character_generator:
+        result += character
+
+    return result
 
 
-def check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False):
+def check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False) -> bool:
     """
     Checks if there is enough quota left on random.org.
 
@@ -497,6 +581,46 @@ def check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_
     Raises:
         requests.exceptions.RequestException: If the request to random.org fails and fail_on_error is True.
         requests.exceptions.Timeout: If the request to random.org times out and fail_on_error is True.
+        RandomQuotaExceeded: If the quota is exceeded and fail_on_error is True.
+    """
+
+    remaining_quota = get_random_org_quota(timeout=timeout, api_key=api_key, fail_on_error=fail_on_error)
+    if remaining_quota is None:
+        if fail_on_error:
+            raise requests.exceptions.RequestException("Failed to get quota from random.org")
+        else:
+            return False
+
+    if remaining_quota >= count:
+        return True
+    else:
+        if fail_on_error:
+            raise RandomQuotaExceeded(
+                message=f"Quota exceeded trying to generate {count} bytes",
+                requested_bits=count * 8,
+                remaining_bits=remaining_quota * 8,
+            )
+        else:
+            return False
+
+
+def get_random_org_quota(timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_on_error=False) -> int | None:
+    """
+    Get the remaining quota on random.org in bytes.
+
+    Args:
+        timeout (int, optional): The timeout for the request to random.org (in seconds). Default is 10 seconds.
+        api_key (str, optional): The API key to use for the request. If None, the value of the _RANDOM_ORG_API_KEY.
+        fail_on_error (bool, optional): If True, raise an exception if the request to random.org fails.
+            Default is False.
+
+    Returns:
+        int: The remaining quota in bytes.
+        None: If it is not possible to get the quota.
+
+    Raises:
+        requests.exceptions.RequestException: If the request to random.org fails and fail_on_error is True.
+        requests.exceptions.Timeout: If the request to random.org times out and fail_on_error is True.
     """
 
     try:
@@ -505,27 +629,23 @@ def check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_
             response = requests.post(_RANDOM_ORG_API_URL, json=_RANDOM_ORG_QUOTA_PAYLOAD, timeout=timeout)
             if response.status_code == 200:
                 remaining = response.json()["result"]["bitsLeft"]
-                if remaining >= count * 8:
-                    return True
-                else:
-                    return False
+                return int(remaining / 8)
             else:
-                # If error on request raise Exception or fallback to pseudo-random numbers
+                # If error on request raise Exception or return False
                 if fail_on_error:
                     raise requests.exceptions.RequestException(
                         f"Request to random.org failed with status code {response.status_code}"
                     )
+                else:
+                    return None
         else:
             # Check quota without an API key. It uses the requesting IP address.
             response = requests.get(_RANDOM_ORG_QUOTA_URL, timeout=timeout)
 
             if response.status_code == 200:
                 # Response is in bits, convert to bytes. Assume 8 bits per byte.
-                quota = int(response.text.strip()) / 8
-                if quota >= count:
-                    return True
-                else:
-                    return False
+                quota = int(int(str(response.text)) / 8)
+                return quota
             else:
                 # If error on request raise Exception or fallback to pseudo-random numbers
                 if fail_on_error:
@@ -535,16 +655,18 @@ def check_random_org_quota(count, timeout=10, api_key=_RANDOM_ORG_API_KEY, fail_
 
     except requests.exceptions.Timeout:
         if fail_on_error:
-            raise requests.exceptions.RequestException(f"Request to random.org timed out after {timeout} seconds")
+            raise requests.exceptions.Timeout(f"Request to random.org timed out after {timeout} seconds")
         else:
-            return False
+            return None
 
     except requests.exceptions.RequestException as e:
         # Handle timeout or other request errors raise Exception or fallback to pseudo-random numbers
         if fail_on_error:
             raise requests.exceptions.RequestException(f"Request to random.org failed with exception {e}")
         else:
-            return False
+            return None
+
+    return None
 
 
 def main():
@@ -554,19 +676,26 @@ def main():
     This script generates random strings or random integers based on the provided arguments.
 
     Arguments:
-    -s, --string: Generate a random string
-    -l, --length: Length of the random string (default: 10)
+    -a, --api-key: The API key to use for the request. If None, the value of the _RANDOM_ORG_API_KEY environment
     -c, --count: Number of random strings to generate (default: 1)
-    -v, --valid-characters: Valid characters for the random string
-    -i, --integers: Generate random integers
-    -u, --unique: Generate unique random integers or strings
-    -t, --timeout: Timeout for the API request (default: 10)
-    -m, --min: Minimum value for random integers (default: 0)
-    -x, --max: Maximum value for random integers (default: 100)
+    -C, --choice: Make a choice from a given set of choices. It can be a list or a dictionary. Optional arguments:
+        number of choices to make (default: 1), unique (default: False)
     -f, --fail-on-error: Fail on error when making API requests
+    -h, --help: Show this help message and exit
+    -i, --integers: Generate random integers
+    -l, --length: Length of the random string (default: 10)
+    -m, --min: Minimum value for random integers (default: 0)
+    -q, --quota: Check the quota for n bytes (default: 0)
+    -s, --string: Generate a random string
+    -t, --timeout: Timeout for the API request (default: 10)
+    -u, --unique: Generate unique random integers or strings
+    -v, --valid-characters: Valid characters for the random string
+    -V, --version: Show the version
+    -x, --max: Maximum value for random integers (default: 100)
     """
 
     parser = argparse.ArgumentParser(description="Random Generator")
+    parser.add_argument("-a", "--api-key", type=str, help="The API key to use for the request")
     parser.add_argument("-s", "--string", action="store_true", help="Generate a random string")
     parser.add_argument("-l", "--length", type=int, default=10, help="Length of the random string. Default is 10")
     parser.add_argument(
@@ -583,30 +712,74 @@ def main():
     parser.add_argument("-m", "--min", type=int, default=0, help="Minimum value for random integers. Default is 0")
     parser.add_argument("-x", "--max", type=int, default=100, help="Maximum value for random integers. Default is 100")
     parser.add_argument("-f", "--fail-on-error", action="store_true", help="Fail on error when making API requests")
+    parser.add_argument("-V", "--version", action="version", version="%(prog)s 1.0.0")
+    parser.add_argument("-q", "--quota", type=int, default=0, help="Check the quota. Default is 0")
+    parser.add_argument(
+        "-C",
+        "--choice",
+        type=str,
+        help="""Make a choice from a given set of choices. It can be a list or a dictionary. Optional arguments: number
+            of choices to make (default: 1), unique (default: False)""",
+    )
 
     args = parser.parse_args()
 
+    count = args.count if args.count else 1
+    unique = args.unique if args.unique else False
+    timeout = args.timeout if args.timeout else 10
+    api_key = args.api_key if args.api_key else _RANDOM_ORG_API_KEY
+    fail_on_error = args.fail_on_error if args.fail_on_error else False
+
     if args.string:
         length = args.length if args.length else 10
-        count = args.count if args.count else 1
         valid_characters = args.valid_characters if args.valid_characters else None
 
         for _ in range(count):
             if valid_characters:
-                random_string = get_true_random_string(length, valid_characters, args.unique, args.timeout)
+                random_string = get_true_random_string(
+                    length,
+                    valid_characters,
+                    unique=unique,
+                    timeout=timeout,
+                    api_key=api_key,
+                    fail_on_error=fail_on_error,
+                )
             else:
-                random_string = get_true_random_string(length, unique=args.unique, timeout=args.timeout)
+                random_string = get_true_random_string(length, unique=unique, timeout=timeout, api_key=api_key)
             print(random_string)
     elif args.integers:
-        count = args.count if args.count else 1
         min_value = args.min if args.min else 0
         max_value = args.max if args.max else 100
-        unique = args.unique if args.unique else False
 
         random_integers = get_true_random_integers(
-            count, min_value, max_value, args.timeout, unique=unique, fail_on_error=args.fail_on_error
+            count, min_value, max_value, timeout, unique=unique, fail_on_error=fail_on_error, api_key=api_key
         )
         print(random_integers)
+    elif args.quota:
+        remaining_quota = get_random_org_quota(timeout, fail_on_error=fail_on_error, api_key=api_key)
+        if args.quota:
+            if remaining_quota >= args.quota:
+                print(f"Enough quota for {args.quota:,} bytes. Remaining bytes={remaining_quota:,}")
+            else:
+                print(f"Not enough quota for {args.quota:,} bytes. Remaining bytes={remaining_quota:,}")
+        else:
+            print(f"Remaining quota={remaining_quota:,} bytes")
+    elif args.choice:
+        try:
+            choices = json.loads(args.choice)
+        except (TypeError, json.JSONDecodeError):
+            print(
+                """ERROR: choices must be a list or a dictionary as a string.
+                The dictionary must be in valid JSON format.""",
+                file=sys.stderr,
+            )
+            parser.print_usage()
+            exit(1)
+
+        random_choices = true_random_choice(
+            choices, count, unique=unique, timeout=timeout, fail_on_error=fail_on_error, api_key=api_key
+        )
+        print([x for x in random_choices])
     else:
         parser.print_usage()
 
